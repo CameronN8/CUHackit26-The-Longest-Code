@@ -19,6 +19,8 @@ from state_packet_protocol import (
     PACKET_SIZE,
     TILE_VEC_MAGIC,
     TILE_VEC_PACKET_SIZE,
+    MENU_CTRL_MAGIC,
+    MENU_CTRL_PACKET_SIZE,
     decode_tile_resource_vector,
 )
 
@@ -160,6 +162,13 @@ def main_loop():
                 if len(buf) < PACKET_SIZE:
                     break
                 buf = buf[PACKET_SIZE:]
+                continue
+
+            # Foreign menu-control packet (for player-display Pico): skip full packet.
+            if first == MENU_CTRL_MAGIC:
+                if len(buf) < MENU_CTRL_PACKET_SIZE:
+                    break
+                buf = buf[MENU_CTRL_PACKET_SIZE:]
                 continue
 
             # Unknown leading byte: drop one and resync.

@@ -9,13 +9,23 @@ or:
 """
 
 import serial
+import time
 
 from state_packet_protocol import (
     DEV_KEYS,
     RESOURCE_KEYS,
     TILE_VEC_LEN,
+    MAGIC,
+    PACKET_SIZE,
+    TILE_VEC_MAGIC,
+    TILE_VEC_PACKET_SIZE,
+    MENU_CTRL_MAGIC,
+    MENU_CTRL_PACKET_SIZE,
+    MENU_EVT_MAGIC,
     encode_snapshot,
     encode_tile_resource_vector,
+    encode_menu_control,
+    decode_menu_event,
 )
 
 
@@ -169,6 +179,87 @@ def send_tile_resource_vector(tiles: list[dict], desert_value: int = 0) -> bytes
 def send_tile_resource_vector_from_game_state(game_state: dict, desert_value: int = 0) -> bytes:
     tiles = game_state.get("tiles", [])
     return send_tile_resource_vector(tiles, desert_value=desert_value)
+
+
+def send_menu_control(active_player: int, reset_menu: bool = True) -> bytes:
+    """Send menu-control command to player-display Pico.
+
+    Typical usage:
+      - At turn start: send_menu_control(active_idx, reset_menu=True)
+      - At turn end:   send_menu_control(next_idx, reset_menu=True)
+    """
+    packet = encode_menu_control(_next_seq(), active_player, reset_menu)
+    _write_to_pico(packet)
+    return packet
+
+
+def send_turn_start_menu(active_player: int) -> bytes:
+    return send_menu_control(active_player=active_player, reset_menu=True)
+
+
+def send_turn_end_menu(next_active_player: int) -> bytes:
+    return send_menu_control(active_player=next_active_player, reset_menu=True)
+
+
+def read_menu_events(timeout_s: float = 0.05, max_events: int = 20) -> list[dict]:
+    """Read and decode menu events returned from player-display Pico over UART.
+
+    The parser is interference-safe: it skips known non-event packet families
+    (player snapshot, tile vector, menu control) and only returns menu events.
+    """
+    deadline = time.time() + max(0.0, float(timeout_s))
+    events = []
+    buf = b""
+
+    with serial.Serial(UART_DEVICE, UART_BAUD, timeout=UART_TIMEOUT) as ser:
+        while time.time() < deadline and len(events) < max_events:
+            waiting = ser.in_waiting
+            if waiting > 0:
+                chunk = ser.read(waiting)
+                if chunk:
+                    buf += chunk
+            else:
+                time.sleep(0.002)
+
+            while len(buf) > 0 and len(events) < max_events:
+                first = buf[0]
+
+                if first == MENU_EVT_MAGIC:
+                    if len(buf) < 5:
+                        break
+                    payload_len = buf[3]
+                    total_len = 5 + payload_len
+                    if len(buf) < total_len:
+                        break
+                    packet = buf[:total_len]
+                    buf = buf[total_len:]
+                    try:
+                        events.append(decode_menu_event(packet))
+                    except Exception:
+                        pass
+                    continue
+
+                if first == MAGIC:
+                    if len(buf) < PACKET_SIZE:
+                        break
+                    buf = buf[PACKET_SIZE:]
+                    continue
+
+                if first == TILE_VEC_MAGIC:
+                    if len(buf) < TILE_VEC_PACKET_SIZE:
+                        break
+                    buf = buf[TILE_VEC_PACKET_SIZE:]
+                    continue
+
+                if first == MENU_CTRL_MAGIC:
+                    if len(buf) < MENU_CTRL_PACKET_SIZE:
+                        break
+                    buf = buf[MENU_CTRL_PACKET_SIZE:]
+                    continue
+
+                buf = buf[1:]
+
+    return events
 
 
 def send_from_game_state(game_state: dict) -> bytes:
