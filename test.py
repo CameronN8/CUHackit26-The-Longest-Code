@@ -1,12 +1,9 @@
-import time
-import lights
+"""Compatibility wrapper for moved light-clock smoke test."""
 
-clock = lights.clock(pin=2, frequency=500)
-clock.start()
+from pathlib import Path
+import runpy
 
-try:
-    for i in range(10):
-        print(f"Main loop iteration {i}")
-        time.sleep(1)  # Main program continues to run
-finally:
-    clock.stop()  # Stop the clock cleanly
+
+if __name__ == "__main__":
+    target = Path(__file__).resolve().parent / "tools" / "lights_clock_smoke.py"
+    runpy.run_path(str(target), run_name="__main__")
