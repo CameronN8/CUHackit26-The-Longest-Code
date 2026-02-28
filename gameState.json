@@ -127,7 +127,7 @@
         "x": 366,
         "y": 164
       },
-      "type": null,
+      "type": "settlement",
       "color": "red"
     },
     {
@@ -387,7 +387,7 @@
         "x": 312,
         "y": 254
       },
-      "type": null,
+      "type": "settlement",
       "color": "red"
     },
     {
@@ -413,7 +413,7 @@
         "x": 452,
         "y": 262
       },
-      "type": null,
+      "type": "settlement",
       "color": "blue"
     },
     {
@@ -569,7 +569,7 @@
         "x": 554,
         "y": 344
       },
-      "type": null,
+      "type": "settlement",
       "color": "blue"
     },
     {
