@@ -78,12 +78,12 @@ class BigScreenViewer:
 
     def _load_icons(self) -> None:
         for resource, filename in RESOURCE_ICON_FILES.items():
-            icon = self._load_png_scaled(ASSETS_DIR / filename, max_px=40)
+            icon = self._load_png_scaled(ASSETS_DIR / filename, max_px=56)
             if icon is not None:
                 self.resource_icons[resource] = icon
 
         for face, filename in DICE_ICON_FILES.items():
-            icon = self._load_png_scaled(ASSETS_DIR / filename, max_px=120)
+            icon = self._load_png_scaled(ASSETS_DIR / filename, max_px=96)
             if icon is not None:
                 self.dice_icons[face] = icon
 
@@ -96,7 +96,7 @@ class BigScreenViewer:
             text="Catan Live Roll",
             bg="#ffffff",
             fg="#111111",
-            font=("Helvetica", 28, "bold"),
+            font=("Helvetica", 24, "bold"),
         ).pack(anchor="center", pady=(0, 8))
 
         top = tk.Frame(self.container, bg="#ffffff")
@@ -122,9 +122,9 @@ class BigScreenViewer:
             textvariable=self.die_1_text,
             bg="#f6f8fb",
             fg="#111111",
-            font=("Helvetica", 42, "bold"),
+            font=("Helvetica", 36, "bold"),
             width=3,
-            height=2,
+            height=1,
             relief="solid",
             bd=1,
         )
@@ -143,9 +143,9 @@ class BigScreenViewer:
             textvariable=self.die_2_text,
             bg="#f6f8fb",
             fg="#111111",
-            font=("Helvetica", 42, "bold"),
+            font=("Helvetica", 36, "bold"),
             width=3,
-            height=2,
+            height=1,
             relief="solid",
             bd=1,
         )
@@ -183,7 +183,15 @@ class BigScreenViewer:
         self.root.bind("<Escape>", lambda _e: self.root.attributes("-fullscreen", False))
         self.root.bind("<F11>", lambda _e: self.root.attributes("-fullscreen", True))
 
-    def _make_cell(self, row: int, col: int, text: str = "", *, bold: bool = False) -> tk.Label:
+    def _make_cell(
+        self,
+        row: int,
+        col: int,
+        text: str = "",
+        *,
+        bold: bool = False,
+        pad_y: int = 6,
+    ) -> tk.Label:
         label = tk.Label(
             self.table,
             text=text,
@@ -191,7 +199,7 @@ class BigScreenViewer:
             fg="#111111",
             font=("Helvetica", 14, "bold" if bold else "normal"),
             padx=8,
-            pady=6,
+            pady=pad_y,
             relief="flat",
         )
         label.grid(row=row, column=col, sticky="nsew", padx=1, pady=1)
@@ -205,16 +213,16 @@ class BigScreenViewer:
         for col in range(len(columns)):
             self.table.grid_columnconfigure(col, weight=1)
 
-        self._make_cell(0, 0, "Player", bold=True)
+        self._make_cell(0, 0, "", bold=True, pad_y=12)
         for idx, resource in enumerate(RESOURCE_ORDER, start=1):
             icon = self.resource_icons.get(resource)
             if icon is None:
-                self._make_cell(0, idx, resource.title(), bold=True)
+                self._make_cell(0, idx, resource.title(), bold=True, pad_y=12)
             else:
-                label = self._make_cell(0, idx, "", bold=True)
+                label = self._make_cell(0, idx, "", bold=True, pad_y=12)
                 label.configure(image=icon)
                 label.image = icon
-        self._make_cell(0, len(columns) - 1, "Total", bold=True)
+        self._make_cell(0, len(columns) - 1, "Total", bold=True, pad_y=12)
 
         row = 1
         for player in players:
