@@ -174,8 +174,8 @@ def render(board: dict, show_ids: bool, show_labels: bool):
 
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Visualize gameState.json")
-    parser.add_argument("--input", default="gameState.json", help="Path to board JSON file")
+    parser = argparse.ArgumentParser(description="Visualize detectedGameState.json")
+    parser.add_argument("--input", default="detectedGameState.json", help="Path to board JSON file")
     parser.add_argument("--output", default=None, help="Optional output image path, e.g. board.png")
     parser.add_argument("--hide-ids", action="store_true", help="Hide settlement ids")
     parser.add_argument("--hide-labels", action="store_true", help="Hide tile labels")
