@@ -94,11 +94,14 @@ class BigScreenViewer:
     def _load_icons(self) -> None:
         for resource, filenames in RESOURCE_ICON_FILES.items():
             icon = None
+            selected_path: Path | None = None
             for filename in filenames:
-                icon = self._load_png_scaled(ASSETS_DIR / filename, max_px=56)
+                candidate = ASSETS_DIR / filename
+                icon = self._load_png_scaled(candidate, max_px=56)
                 if icon is not None:
+                    selected_path = candidate
                     break
-            if icon is None:
+            if icon is None or selected_path is None:
                 for asset_path in ASSETS_DIR.iterdir():
                     if not asset_path.is_file():
                         continue
@@ -108,9 +111,15 @@ class BigScreenViewer:
                     if name == resource or name.startswith(f"{resource}_"):
                         icon = self._load_png_scaled(asset_path, max_px=56)
                         if icon is not None:
+                            selected_path = asset_path
                             break
             if icon is not None:
                 self.resource_icons[resource] = icon
+                # Cards Remaining uses larger, direct-from-source icons to avoid pixelation.
+                if selected_path is not None:
+                    bank_icon = self._load_png_scaled(selected_path, max_px=112)
+                    if bank_icon is not None:
+                        self.bank_resource_icons[resource] = bank_icon
 
         for face, filename in DICE_ICON_FILES.items():
             icon = self._load_png_scaled(ASSETS_DIR / filename, max_px=64)
@@ -121,19 +130,10 @@ class BigScreenViewer:
             icon = self._load_png_scaled(ASSETS_DIR / filename, max_px=56)
             if icon is not None:
                 self.dev_icon = icon
+                bank_icon = self._load_png_scaled(ASSETS_DIR / filename, max_px=112)
+                if bank_icon is not None:
+                    self.bank_dev_icon = bank_icon
                 break
-
-        # Cards Remaining panel: use 2x icons without affecting Resources Gained sizing.
-        for resource, icon in self.resource_icons.items():
-            try:
-                self.bank_resource_icons[resource] = icon.zoom(2, 2)
-            except Exception:
-                self.bank_resource_icons[resource] = icon
-        if self.dev_icon is not None:
-            try:
-                self.bank_dev_icon = self.dev_icon.zoom(2, 2)
-            except Exception:
-                self.bank_dev_icon = self.dev_icon
 
     def _make_panel(self, parent: tk.Widget, title: str) -> tk.Frame:
         panel = tk.Frame(parent, bg=PANEL_BG, bd=1, relief="solid")
@@ -243,7 +243,7 @@ class BigScreenViewer:
         ).pack(anchor="center", pady=(2, 0))
 
         bank_body = tk.Frame(self.panel_top_right, bg=PANEL_BG)
-        bank_body.pack(fill="both", expand=True, padx=12, pady=(8, 10))
+        bank_body.pack(fill="both", expand=True, padx=8, pady=(0, 4))
         self.bank_grid = tk.Frame(bank_body, bg=PANEL_BG)
         self.bank_grid.pack(expand=True)
 
@@ -332,7 +332,7 @@ class BigScreenViewer:
         parent.grid_columnconfigure(col, weight=1)
         parent.grid_rowconfigure(row, weight=1)
 
-        icon_holder = tk.Frame(cell, bg="#ffffff", width=126, height=126)
+        icon_holder = tk.Frame(cell, bg="#ffffff", width=132, height=126)
         icon_holder.pack(pady=(0, 0))
         icon_holder.pack_propagate(False)
 
@@ -340,7 +340,7 @@ class BigScreenViewer:
         if icon is not None:
             icon_label = tk.Label(icon_holder, image=icon, bg="#ffffff")
             icon_label.image = icon
-            icon_label.place(relx=0.5, rely=0.5, anchor="center")
+            icon_label.place(relx=0.5, rely=0.46, anchor="center")
         else:
             fallback = "Dev" if key == "dev" else key.title()
             tk.Label(
@@ -349,16 +349,16 @@ class BigScreenViewer:
                 bg="#ffffff",
                 fg=MUTED,
                 font=("Helvetica", 15, "bold"),
-            ).place(relx=0.5, rely=0.5, anchor="center")
+            ).place(relx=0.5, rely=0.46, anchor="center")
 
         count_label = tk.Label(
             cell,
             textvariable=value_var,
             bg="#ffffff",
             fg=TXT,
-            font=("Helvetica", 14, "bold"),
+            font=("Helvetica", 10, "bold"),
         )
-        count_label.place(relx=1.0, rely=1.0, x=-1, y=-1, anchor="se")
+        count_label.place(relx=0.5, rely=1.0, x=0, y=-2, anchor="s")
         count_label.lift()
 
     def _render_gain_lines(self, players: list[dict], payouts: dict[str, dict[str, int]]) -> None:
