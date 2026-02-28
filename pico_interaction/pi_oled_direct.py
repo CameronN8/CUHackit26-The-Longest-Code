@@ -32,7 +32,7 @@ class OledConfig:
     menu_sda_bcm_pin: int = 4
     width: int = 128
     height: int = 64
-    address: int = 0x3C
+    address_candidates: tuple[int, int] = (0x3C, 0x3D)
     i2c_frequency: int = 400_000
 
 
@@ -44,7 +44,7 @@ class PiSoftI2COled:
         sda_bcm_pin: int,
         width: int,
         height: int,
-        address: int,
+        address_candidates: Sequence[int],
         i2c_frequency: int,
     ) -> None:
         try:
@@ -73,12 +73,25 @@ class PiSoftI2COled:
         scl = self._bcm_to_board_pin(board, scl_bcm_pin)
         sda = self._bcm_to_board_pin(board, sda_bcm_pin)
         self._i2c = bitbangio.I2C(scl=scl, sda=sda, frequency=int(i2c_frequency))
-        self._oled = adafruit_ssd1306.SSD1306_I2C(
-            self.width,
-            self.height,
-            self._i2c,
-            addr=int(address),
-        )
+        self._oled = None
+        last_exc = None
+        for address in address_candidates:
+            try:
+                self._oled = adafruit_ssd1306.SSD1306_I2C(
+                    self.width,
+                    self.height,
+                    self._i2c,
+                    addr=int(address),
+                )
+                break
+            except Exception as exc:
+                last_exc = exc
+
+        if self._oled is None:
+            addr_text = ", ".join(f"0x{int(a):02X}" for a in address_candidates)
+            raise RuntimeError(
+                f"No SSD1306 responded on SDA BCM{sda_bcm_pin}. Tried {addr_text}"
+            ) from last_exc
         self.clear()
 
     @staticmethod
@@ -116,7 +129,7 @@ class PiDirectPlayerDisplays:
             "scl_bcm_pin": self.config.scl_bcm_pin,
             "width": self.config.width,
             "height": self.config.height,
-            "address": self.config.address,
+            "address_candidates": self.config.address_candidates,
             "i2c_frequency": self.config.i2c_frequency,
         }
 

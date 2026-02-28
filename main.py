@@ -14,7 +14,20 @@ import setup_phase
 import turn_logic
 import vp_scoring
 
+try:
+    from pico_interaction.pi_oled_direct import build_default_player_display
+    from pico_interaction.rotary_menu_controller import PiRotaryEncoder, PlayerTurnMenu
+except Exception:
+    build_default_player_display = None
+    PiRotaryEncoder = None
+    PlayerTurnMenu = None
+
 SCRIPT_DIR = Path(__file__).resolve().parent
+
+ENC_CLK_PIN = 17
+ENC_DT_PIN = 27
+ENC_SW_PIN = 22
+MENU_POLL_DELAY_S = 0.03
 
 
 DetectBoardCallback = Callable[[dict[str, Any], str, str | None], None]
@@ -113,6 +126,88 @@ def initialize_runtime_defaults(game_state: dict[str, Any]) -> None:
     game.setdefault("last_roll", None)
 
 
+class DirectPiTurnInput:
+    def __init__(self) -> None:
+        if PiRotaryEncoder is None or PlayerTurnMenu is None:
+            raise RuntimeError("rotary menu dependencies unavailable")
+
+        self.encoder = PiRotaryEncoder(ENC_CLK_PIN, ENC_DT_PIN, ENC_SW_PIN)
+        self.menu = PlayerTurnMenu(active_player_idx=0)
+        self.displays = None
+        self._active_player_idx = None
+
+        if build_default_player_display is not None:
+            try:
+                self.displays = build_default_player_display()
+            except Exception as exc:
+                print(f"[PI-OLED] Disabled direct OLED output: {exc}")
+
+    def _render(self, game_state: dict[str, Any], player_idx: int) -> None:
+        if self.displays is None:
+            return
+
+        players = game_state.get("players", [])
+        player = players[player_idx] if player_idx < len(players) else {}
+        if isinstance(player, dict):
+            self.displays.apply_snapshot(player, player_idx=player_idx)
+        self.displays.draw_interface_menu(self.menu.get_render_lines())
+
+    def _normalize_event(self, event: dict[str, Any]) -> dict[str, Any]:
+        event_type = str(event.get("type", ""))
+        if event_type == "end_turn":
+            return {"type": "end_turn"}
+        if event_type == "buy_dev_card":
+            return {"type": "buy_development_card"}
+        if event_type == "trade_port":
+            return {"type": "trade_bank", "give": "wood", "get": "brick", "rate": 4}
+        return {"type": f"unsupported_{event_type}"}
+
+    def get_turn_action(self, player: dict[str, Any], game_state: dict[str, Any]) -> dict[str, Any]:
+        game = game_state.get("game", {})
+        player_idx = int(game.get("current_player_index", 0) or 0)
+        players = game_state.get("players", [])
+        if not isinstance(players, list) or not players:
+            return {"type": "end_turn"}
+        player_idx %= len(players)
+
+        self.menu.set_players(players)
+        if self._active_player_idx != player_idx:
+            self._active_player_idx = player_idx
+            self.menu.set_active_player(player_idx)
+            self._render(game_state, player_idx)
+
+        while True:
+            delta, pressed = self.encoder.read_input()
+            if delta == 0 and not pressed:
+                time.sleep(MENU_POLL_DELAY_S)
+                continue
+
+            event = self.menu.update(delta, pressed)
+            self._render(game_state, player_idx)
+            if event:
+                return self._normalize_event(event)
+
+    def cleanup(self) -> None:
+        if PiRotaryEncoder is not None:
+            PiRotaryEncoder.cleanup()
+
+
+def maybe_attach_direct_pi_turn_input(hardware: HardwareController) -> DirectPiTurnInput | None:
+    if PiRotaryEncoder is None or PlayerTurnMenu is None:
+        print("[PI-INPUT] Direct rotary menu unavailable; using existing hardware controller.")
+        return None
+
+    try:
+        turn_input = DirectPiTurnInput()
+    except Exception as exc:
+        print(f"[PI-INPUT] Failed to initialize direct rotary menu: {exc}")
+        return None
+
+    hardware.get_turn_action = turn_input.get_turn_action  # type: ignore[assignment]
+    print("[PI-INPUT] Using direct rotary menu + OLED turn input.")
+    return turn_input
+
+
 def run_game_loop(
     game_state: dict[str, Any],
     hardware: HardwareController,
@@ -168,7 +263,6 @@ def run_game_loop(
         turns_executed += 1
         if save_snapshot_callback:
             save_snapshot_callback(game_state)
-        time.sleep(5)
 
     if game_state["game"]["phase"] == "ended":
         winner_color = game_state["game"]["winner"]
@@ -263,6 +357,7 @@ def main() -> None:
     hardware = HardwareController(interactive=args.interactive)
     rng = random.Random(args.seed)
     detect_board_callback = build_detect_callback(args)
+    turn_input = maybe_attach_direct_pi_turn_input(hardware)
 
     viewer_process = maybe_start_big_screen_viewer(output_path, args)
     try:
@@ -275,6 +370,8 @@ def main() -> None:
             save_snapshot_callback=lambda state: save_state(output_path, state),
         )
     finally:
+        if turn_input is not None:
+            turn_input.cleanup()
         if viewer_process is not None and viewer_process.poll() is None:
             viewer_process.terminate()
             try:
