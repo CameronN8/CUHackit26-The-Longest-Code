@@ -19,7 +19,7 @@ class clock:
                 self.output.on()
             else:
                 self.output.off()
-            if self.count == 19:
+            if self.count == 20:
                 self.count = 0
             sleep(self.delay)
 
