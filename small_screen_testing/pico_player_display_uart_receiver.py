@@ -14,7 +14,7 @@ Ingress:
 
 from machine import Pin, SoftI2C, UART
 import ssd1306
-from player_state_protocol import (
+from state_packet_protocol import (
     MAGIC,
     PACKET_SIZE,
     TILE_VEC_MAGIC,

@@ -14,7 +14,7 @@ This script intentionally ignores player-state packets on the same UART stream.
 from machine import Pin, PWM, UART
 import utime
 
-from player_state_protocol import (
+from state_packet_protocol import (
     MAGIC,
     PACKET_SIZE,
     TILE_VEC_MAGIC,

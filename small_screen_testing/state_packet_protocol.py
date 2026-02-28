@@ -1,4 +1,4 @@
-"""Binary protocol for Pi -> Pico player-state snapshots.
+"""Binary protocol for Pi -> Pico state snapshots.
 
 Packet format:
   byte 0   : MAGIC (0xC7)

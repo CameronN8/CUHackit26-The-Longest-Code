@@ -10,7 +10,7 @@ or:
 
 import serial
 
-from player_state_protocol import (
+from state_packet_protocol import (
     DEV_KEYS,
     RESOURCE_KEYS,
     TILE_VEC_LEN,

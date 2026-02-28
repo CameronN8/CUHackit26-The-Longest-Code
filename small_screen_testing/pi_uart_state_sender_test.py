@@ -7,7 +7,7 @@ send player snapshots to Pico.
 
 import time
 
-from pi_i2c_channel_sender import (
+from pi_uart_state_sender import (
     send_players_to_pico,
     send_tile_resource_vector_from_game_state,
 )
