@@ -1,24 +1,26 @@
-"""Pi-side manual test for rotary menu interaction on player display Pico.
+"""Pi-side interactive rotary menu smoke test.
 
-What this does:
-1) Sends mock player snapshot data so menu has dev/resources context.
-2) Activates one player's menu (default player 1 / index 0) and resets to root.
-3) Continuously reads menu events from Pico and prints them.
-
-Use this while physically rotating/pressing the encoder on the active player.
+Run this on the Raspberry Pi. It does all menu logic on Pi:
+- reads rotary encoder pins
+- computes menu state/actions
+- sends render lines to player's 3rd OLED via UART packet
+- prints returned actions for main game logic integration
 """
 
 import time
 
-from pi_uart_state_sender import (
-    read_menu_events,
-    send_players_to_pico,
-    send_turn_start_menu,
-)
+from pi_uart_state_sender import send_menu_render, send_players_to_pico
+from rotary_menu_controller import PiRotaryEncoder, PlayerTurnMenu
 
 
-ACTIVE_PLAYER_IDX = 0  # 0-based: 0->P1, 1->P2, 2->P3
-POLL_INTERVAL_S = 0.05
+# ===== PI ROTARY WIRING (BCM GPIO) =====
+ENC_CLK_PIN = 17
+ENC_DT_PIN = 27
+ENC_SW_PIN = 22
+# =======================================
+
+ACTIVE_PLAYER_IDX = 0
+LOOP_DELAY_S = 0.03
 
 
 def build_mock_players():
@@ -63,22 +65,36 @@ def build_mock_players():
 
 
 def main():
-    print("Sending mock player snapshot...")
-    packet = send_players_to_pico(build_mock_players())
-    print("snapshot bytes:", len(packet))
+    players = build_mock_players()
+    send_players_to_pico(players)
 
-    print(f"Activating player menu: P{ACTIVE_PLAYER_IDX + 1}")
-    ctrl = send_turn_start_menu(ACTIVE_PLAYER_IDX)
-    print("menu-control bytes:", len(ctrl))
+    menu = PlayerTurnMenu(active_player_idx=ACTIVE_PLAYER_IDX)
+    menu.set_players(players)
+    encoder = PiRotaryEncoder(ENC_CLK_PIN, ENC_DT_PIN, ENC_SW_PIN)
 
-    print("Now rotate/press encoder. Waiting for menu events (Ctrl+C to stop).")
+    lines = menu.get_render_lines()
+    send_menu_render(ACTIVE_PLAYER_IDX, lines)
+    print("Menu test running. Rotate/press encoder. Ctrl+C to stop.")
+
     try:
         while True:
-            events = read_menu_events(timeout_s=POLL_INTERVAL_S, max_events=20)
-            for event in events:
-                print("MENU EVENT:", event)
-            time.sleep(POLL_INTERVAL_S)
+            delta, pressed = encoder.read_input()
+            if delta == 0 and not pressed:
+                time.sleep(LOOP_DELAY_S)
+                continue
+
+            action = menu.update(delta, pressed)
+            lines = menu.get_render_lines()
+            send_menu_render(ACTIVE_PLAYER_IDX, lines)
+
+            if action:
+                print("ACTION:", action)
+
+            time.sleep(LOOP_DELAY_S)
     except KeyboardInterrupt:
+        pass
+    finally:
+        PiRotaryEncoder.cleanup()
         print("Stopped.")
 
 

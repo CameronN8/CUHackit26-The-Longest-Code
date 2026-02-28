@@ -1,15 +1,12 @@
-"""Pico-side player display receiver with rotary-interactive third screen.
+"""Pico-side player display receiver (render-only, no encoder logic).
 
 Displays per player (shared SCL, distinct SDA):
-  pin tuple = (resources, vp, interactive_menu)
+  pin tuple = (resources, vp, menu)
 
 UART ingress packet types accepted:
 - player snapshot packets (resources/vp/dev data)
-- menu control packets (set active player, reset root menu)
-- tile packets are explicitly skipped (for shared UART coexistence)
-
-UART egress packet types produced:
-- menu event packets when local rotary menu actions are confirmed
+- menu-render packets (4 text lines for active player's menu screen)
+- tile packets are explicitly skipped (shared UART coexistence)
 """
 
 from machine import Pin, SoftI2C, UART
@@ -21,17 +18,14 @@ from state_packet_protocol import (
     PACKET_SIZE,
     TILE_VEC_MAGIC,
     TILE_VEC_PACKET_SIZE,
-    MENU_CTRL_MAGIC,
-    MENU_CTRL_PACKET_SIZE,
-    MENU_EVT_MAGIC,
+    MENU_RENDER_MAGIC,
+    MENU_RENDER_PACKET_SIZE,
     decode_snapshot,
-    decode_menu_control,
-    encode_menu_event,
+    decode_menu_render,
 )
-from rotary_menu_controller import PlayerMenuController, RotaryEncoder
 
 
-# ===== UART LINK (Pi <-> Pico) =====
+# ===== UART LINK (Pi -> Pico) =====
 UART_ID = 0
 UART_BAUD = 115200
 UART_TX_PIN = 0
@@ -54,32 +48,13 @@ PLAYER_DISPLAY_PINS = {
 }
 # ==========================
 
-
-# ===== ENCODER WIRING =====
-# player index -> (clk, dt, sw)
-PLAYER_ENCODER_PINS = {
-    0: (11, 12, 13),
-    1: (14, 16, 17),
-    2: (18, 19, 20),
-}
-# ==========================
-
 RESOURCE_ORDER = ("wood", "brick", "sheep", "wheat", "ore")
 
 
 class MultiDisplayBridge:
     def __init__(self):
         self.displays = {}
-        self.menu_ctrl = {}
-        self.active_player = 0
-        self._evt_seq = 0
-
-        self._init_displays_and_encoders()
-
-    def _next_evt_seq(self):
-        value = self._evt_seq
-        self._evt_seq = (self._evt_seq + 1) & 0xFF
-        return value
+        self._init_displays()
 
     def _init_one_display(self, sda_pin):
         i2c = SoftI2C(scl=Pin(SCL_PIN), sda=Pin(sda_pin), freq=FREQ)
@@ -88,22 +63,12 @@ class MultiDisplayBridge:
         oled.show()
         return oled
 
-    def _init_displays_and_encoders(self):
+    def _init_displays(self):
         for player_idx, pin_triplet in PLAYER_DISPLAY_PINS.items():
             res_pin, vp_pin, menu_pin = pin_triplet
-            res_oled = self._init_one_display(res_pin)
-            vp_oled = self._init_one_display(vp_pin)
-            menu_oled = self._init_one_display(menu_pin)
-
-            self.displays[(player_idx, "resources")] = res_oled
-            self.displays[(player_idx, "vp")] = vp_oled
-            self.displays[(player_idx, "menu")] = menu_oled
-
-            enc_pins = PLAYER_ENCODER_PINS[player_idx]
-            encoder = RotaryEncoder(enc_pins[0], enc_pins[1], enc_pins[2])
-            menu = PlayerMenuController(menu_oled, player_idx, encoder)
-            menu.set_active(player_idx == self.active_player, reset_menu=True)
-            self.menu_ctrl[player_idx] = menu
+            self.displays[(player_idx, "resources")] = self._init_one_display(res_pin)
+            self.displays[(player_idx, "vp")] = self._init_one_display(vp_pin)
+            self.displays[(player_idx, "menu")] = self._init_one_display(menu_pin)
 
     def _draw_resources(self, oled, player_idx, resources):
         total = 0
@@ -129,39 +94,31 @@ class MultiDisplayBridge:
         oled.text("POINTS: {}".format(int(vp)), 0, 20)
         oled.show()
 
+    def _draw_menu_lines(self, oled, lines):
+        oled.fill(0)
+        y = 0
+        for line in lines[:4]:
+            oled.text(str(line)[:21], 0, y)
+            y += 16
+        oled.show()
+
     def apply_snapshot(self, snapshot):
         players = snapshot.get("players", [])
         for player_idx in range(3):
             if player_idx >= len(players):
                 continue
-
             player = players[player_idx]
             resources = player.get("resources", {})
             vp = int(player.get("victory_points", 0) or 0)
-
             self._draw_resources(self.displays[(player_idx, "resources")], player_idx, resources)
             self._draw_vp(self.displays[(player_idx, "vp")], player_idx, vp)
-            self.menu_ctrl[player_idx].set_player_data(player)
 
-    def apply_menu_control(self, menu_ctrl):
-        active = int(menu_ctrl.get("active_player", 0) or 0)
-        if active < 0:
-            active = 0
-        if active > 2:
-            active = 2
-        reset_menu = bool(menu_ctrl.get("reset_menu", False))
-
-        self.active_player = active
-        for idx in range(3):
-            self.menu_ctrl[idx].set_active(idx == active, reset_menu=reset_menu)
-
-    def poll_menu_and_maybe_emit(self, uart_link):
-        # Poll all controllers so inactive screens can still redraw "waiting" state.
-        for idx in range(3):
-            event = self.menu_ctrl[idx].update()
-            if event:
-                packet = encode_menu_event(self._next_evt_seq(), event)
-                uart_link.write(packet)
+    def apply_menu_render(self, menu_payload):
+        player_idx = int(menu_payload.get("player_idx", 0) or 0)
+        if player_idx < 0 or player_idx > 2:
+            return
+        lines = menu_payload.get("lines", ["", "", "", ""])
+        self._draw_menu_lines(self.displays[(player_idx, "menu")], lines)
 
 
 BRIDGE = MultiDisplayBridge()
@@ -173,45 +130,32 @@ def uart_packet_loop():
     buf = b""
 
     while True:
-        # Always poll menu interaction regardless of ingress traffic.
-        BRIDGE.poll_menu_and_maybe_emit(UART_LINK)
-
         if UART_LINK.any():
             chunk = UART_LINK.read(UART_LINK.any())
             if chunk:
                 buf += chunk
 
-        # Parse as many complete packets as are available.
         while len(buf) > 0:
             first = buf[0]
 
-            # Tile packet belongs to second Pico, skip whole frame.
             if first == TILE_VEC_MAGIC:
                 if len(buf) < TILE_VEC_PACKET_SIZE:
                     break
                 buf = buf[TILE_VEC_PACKET_SIZE:]
                 continue
 
-            # Outbound menu events should not appear as inbound; if they do,
-            # skip one byte to resync safely.
-            if first == MENU_EVT_MAGIC:
-                buf = buf[1:]
-                continue
-
-            # Menu control packet (Pi -> this Pico)
-            if first == MENU_CTRL_MAGIC:
-                if len(buf) < MENU_CTRL_PACKET_SIZE:
+            if first == MENU_RENDER_MAGIC:
+                if len(buf) < MENU_RENDER_PACKET_SIZE:
                     break
-                packet = buf[:MENU_CTRL_PACKET_SIZE]
-                buf = buf[MENU_CTRL_PACKET_SIZE:]
+                packet = buf[:MENU_RENDER_PACKET_SIZE]
+                buf = buf[MENU_RENDER_PACKET_SIZE:]
                 try:
-                    ctrl = decode_menu_control(packet)
-                    BRIDGE.apply_menu_control(ctrl)
+                    payload = decode_menu_render(packet)
+                    BRIDGE.apply_menu_render(payload)
                 except Exception:
                     pass
                 continue
 
-            # Player snapshot packet (Pi -> this Pico)
             if first == MAGIC:
                 if len(buf) < PACKET_SIZE:
                     break
@@ -224,7 +168,6 @@ def uart_packet_loop():
                     pass
                 continue
 
-            # Unknown start byte, drop one and continue resync.
             buf = buf[1:]
 
         utime.sleep_ms(4)
