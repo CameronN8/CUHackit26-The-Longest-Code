@@ -57,11 +57,16 @@ class MultiDisplayBridge:
         self._init_displays()
 
     def _init_one_display(self, sda_pin):
-        i2c = SoftI2C(scl=Pin(SCL_PIN), sda=Pin(sda_pin), freq=FREQ)
-        oled = ssd1306.SSD1306_I2C(WIDTH, HEIGHT, i2c, addr=DISPLAY_ADDR)
-        oled.fill(0)
-        oled.show()
-        return oled
+        try:
+            i2c = SoftI2C(scl=Pin(SCL_PIN), sda=Pin(sda_pin), freq=FREQ)
+            oled = ssd1306.SSD1306_I2C(WIDTH, HEIGHT, i2c, addr=DISPLAY_ADDR)
+            oled.fill(0)
+            oled.show()
+            return oled
+        except OSError:
+            # Allow partial hardware bring-up (e.g., testing only one OLED).
+            print("No OLED on SDA pin {}".format(sda_pin))
+            return None
 
     def _init_displays(self):
         for player_idx, pin_triplet in PLAYER_DISPLAY_PINS.items():
@@ -71,6 +76,8 @@ class MultiDisplayBridge:
             self.displays[(player_idx, "menu")] = self._init_one_display(menu_pin)
 
     def _draw_resources(self, oled, player_idx, resources):
+        if oled is None:
+            return
         total = 0
         for key in RESOURCE_ORDER:
             total += int(resources.get(key, 0) or 0)
@@ -89,12 +96,16 @@ class MultiDisplayBridge:
         oled.show()
 
     def _draw_vp(self, oled, player_idx, vp):
+        if oled is None:
+            return
         oled.fill(0)
         oled.text("P{} VP".format(player_idx + 1), 0, 0)
         oled.text("POINTS: {}".format(int(vp)), 0, 20)
         oled.show()
 
     def _draw_menu_lines(self, oled, lines):
+        if oled is None:
+            return
         oled.fill(0)
         y = 0
         for line in lines[:4]:
