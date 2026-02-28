@@ -73,7 +73,7 @@ class BigScreenViewer:
 
         self.root.title("Catan Display")
         self.root.configure(bg=APP_BG)
-        self.root.attributes("-fullscreen", True)
+        self._set_fullscreen(True)
 
         self._load_icons()
         self._build_ui()
@@ -313,8 +313,19 @@ class BigScreenViewer:
             font=("Helvetica", 10),
         ).pack(anchor="w", pady=(6, 0))
 
-        self.root.bind("<Escape>", lambda _e: self.root.attributes("-fullscreen", False))
-        self.root.bind("<F11>", lambda _e: self.root.attributes("-fullscreen", True))
+        self.root.bind("<Escape>", lambda _e: self._set_fullscreen(False))
+        self.root.bind("<F11>", lambda _e: self._set_fullscreen(True))
+
+        # Some desktop sessions ignore one fullscreen hint at startup.
+        self.root.after(120, lambda: self._set_fullscreen(True))
+
+    def _set_fullscreen(self, enabled: bool) -> None:
+        self.root.attributes("-fullscreen", enabled)
+        if enabled:
+            self.root.update_idletasks()
+            width = self.root.winfo_screenwidth()
+            height = self.root.winfo_screenheight()
+            self.root.geometry(f"{width}x{height}+0+0")
 
     def _set_die_label(self, label: tk.Label, value: object, text_var: tk.StringVar) -> None:
         if isinstance(value, int) and value in self.dice_icons:
