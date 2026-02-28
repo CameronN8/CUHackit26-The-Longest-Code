@@ -35,10 +35,16 @@ UART_RX_PIN = 1
 
 # ===== DISPLAY WIRING =====
 SCL_PIN = 15
-DISPLAY_ADDR = 0x3C
 WIDTH = 128
 HEIGHT = 64
 FREQ = 400_000
+DISPLAY_ADDR_CANDIDATES = (0x3C, 0x3D)
+
+# Quick hardware debug mode:
+# - True: only initialize P1 menu display on SINGLE_MENU_SDA_PIN
+# - False: initialize full 3x3 map below
+SINGLE_DISPLAY_TEST_MODE = True
+SINGLE_MENU_SDA_PIN = 4
 
 # player index -> (resources_sda, vp_sda, menu_sda)
 PLAYER_DISPLAY_PINS = {
@@ -59,16 +65,33 @@ class MultiDisplayBridge:
     def _init_one_display(self, sda_pin):
         try:
             i2c = SoftI2C(scl=Pin(SCL_PIN), sda=Pin(sda_pin), freq=FREQ)
-            oled = ssd1306.SSD1306_I2C(WIDTH, HEIGHT, i2c, addr=DISPLAY_ADDR)
-            oled.fill(0)
-            oled.show()
-            return oled
+            found = i2c.scan()
+            if found:
+                print("SDA {} scan -> {}".format(sda_pin, found))
+            for addr in DISPLAY_ADDR_CANDIDATES:
+                if addr not in found:
+                    continue
+                oled = ssd1306.SSD1306_I2C(WIDTH, HEIGHT, i2c, addr=addr)
+                oled.fill(0)
+                oled.show()
+                print("OLED on SDA {} addr 0x{:02X}".format(sda_pin, addr))
+                return oled
+            print("No SSD1306 addr on SDA {} (scan={})".format(sda_pin, found))
+            return None
         except OSError:
             # Allow partial hardware bring-up (e.g., testing only one OLED).
             print("No OLED on SDA pin {}".format(sda_pin))
             return None
 
     def _init_displays(self):
+        if SINGLE_DISPLAY_TEST_MODE:
+            for idx in range(3):
+                self.displays[(idx, "resources")] = None
+                self.displays[(idx, "vp")] = None
+                self.displays[(idx, "menu")] = None
+            self.displays[(0, "menu")] = self._init_one_display(SINGLE_MENU_SDA_PIN)
+            return
+
         for player_idx, pin_triplet in PLAYER_DISPLAY_PINS.items():
             res_pin, vp_pin, menu_pin = pin_triplet
             self.displays[(player_idx, "resources")] = self._init_one_display(res_pin)
