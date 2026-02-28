@@ -15,7 +15,7 @@ import time
 
 from pi_oled_direct import OledDependencyError, build_default_player_display
 
-LOOP_DELAY_S = 0.5
+LOOP_DELAY_S = 0.03
 PLAYER_IDX = 0
 
 
