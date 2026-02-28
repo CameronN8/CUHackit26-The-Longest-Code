@@ -1,2 +1,3 @@
-﻿matplotlib
+matplotlib
 opencv-python
+pyserial
