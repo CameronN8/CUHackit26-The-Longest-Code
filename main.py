@@ -212,7 +212,7 @@ def maybe_start_big_screen_viewer(
     if args.no_big_screen:
         return None
 
-    viewer_path = SCRIPT_DIR / "big_screen_testing" / "gui_controller.py"
+    viewer_path = SCRIPT_DIR / "main_display" / "gui_controller.py"
     if not viewer_path.exists():
         print(f"[BIG-SCREEN] Viewer not found at {viewer_path}; continuing without it.")
         return None
