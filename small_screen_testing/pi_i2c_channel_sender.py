@@ -1,4 +1,4 @@
-"""Pi-side snapshot sender for 3-player/9-display Pico bridge.
+"""Pi-side snapshot sender for 3-player/9-display Pico bridge over UART.
 
 No command-line arguments are required for normal use.
 Edit constants below once, then call:
@@ -8,15 +8,16 @@ or:
   send_from_game_state(...)
 """
 
-from smbus2 import SMBus, i2c_msg
+import serial
 
 from player_state_protocol import DEV_KEYS, RESOURCE_KEYS, encode_snapshot
 
 
-# ===== HARD-CODED PI -> PICO I2C LINK SETTINGS =====
-PI_I2C_BUS = 1          # /dev/i2c-1 on Raspberry Pi (GPIO2/3)
-PICO_I2C_ADDR = 0x42    # Pico bridge slave address
-# ====================================================
+# ===== HARD-CODED PI -> PICO UART LINK SETTINGS =====
+UART_DEVICE = "/dev/serial0"   # Pi primary UART device (GPIO14 TX / GPIO15 RX)
+UART_BAUD = 115200
+UART_TIMEOUT = 0.2
+# =====================================================
 
 
 _seq = 0
@@ -29,11 +30,10 @@ def _next_seq():
     return value
 
 
-def _write_to_pico(packet: bytes) -> None:
-    """Send one fully encoded packet to Pico over I2C."""
-    with SMBus(PI_I2C_BUS) as bus:
-        msg = i2c_msg.write(PICO_I2C_ADDR, packet)
-        bus.i2c_rdwr(msg)
+def _write_to_pico(packet):
+    """Send one fully encoded packet to Pico over UART."""
+    with serial.Serial(UART_DEVICE, UART_BAUD, timeout=UART_TIMEOUT) as ser:
+        ser.write(packet)
 
 
 def send_snapshot(
@@ -118,7 +118,7 @@ def demo_send_once() -> None:
         {"knight": 2, "victory_point": 0, "road_building": 0, "year_of_plenty": 1, "monopoly": 0},
     ]
     packet = send_snapshot(resources, vp, dev)
-    print(f"sent {len(packet)} bytes to pico 0x{PICO_I2C_ADDR:02X} on /dev/i2c-{PI_I2C_BUS}")
+    print(f"sent {len(packet)} bytes to pico on {UART_DEVICE} @ {UART_BAUD} baud")
 
 
 if __name__ == "__main__":

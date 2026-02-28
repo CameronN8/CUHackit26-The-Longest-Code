@@ -1,4 +1,3 @@
 matplotlib
 opencv-python
 pyserial
-smbus2

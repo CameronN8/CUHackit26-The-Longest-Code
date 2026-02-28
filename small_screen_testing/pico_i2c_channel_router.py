@@ -1,4 +1,4 @@
-"""Pico-side renderer brain for 9 SSD1306 displays.
+"""Pico-side renderer brain for 9 SSD1306 displays (UART ingress).
 
 Display routing (by SDA pin):
   Player 1: pins 2,3,4  -> resources, VP, dev
@@ -7,18 +7,22 @@ Display routing (by SDA pin):
 
 All displays share one SCL pin.
 
-Important transport note:
-- This file focuses on packet decode + rendering (the "brainwork").
-- RP2040 MicroPython does not provide a robust built-in I2C slave ingress for Pi->Pico.
-- Use `apply_snapshot_packet(packet)` from your ingress layer, or use the included
-  stdin hex test loop while prototyping.
+Ingress:
+- Pi sends fixed-size snapshot packets over UART.
+- Pico reads packets from UART RX, decodes, and renders all 9 displays.
 """
 
-from machine import Pin, SoftI2C
-import sys
-
+from machine import Pin, SoftI2C, UART
 import ssd1306
-from player_state_protocol import decode_snapshot
+from player_state_protocol import MAGIC, PACKET_SIZE, decode_snapshot
+
+
+# ===== UART LINK (Pi -> Pico) =====
+UART_ID = 0
+UART_BAUD = 115200
+UART_TX_PIN = 0
+UART_RX_PIN = 1
+# ==================================
 
 
 # ===== DISPLAY WIRING =====
@@ -45,7 +49,7 @@ class MultiDisplayBridge:
         self.displays = {}
         self._init_displays()
 
-    def _init_one(self, sda_pin: int):
+    def _init_one(self, sda_pin):
         i2c = SoftI2C(scl=Pin(SCL_PIN), sda=Pin(sda_pin), freq=FREQ)
         oled = ssd1306.SSD1306_I2C(WIDTH, HEIGHT, i2c, addr=DISPLAY_ADDR)
         oled.fill(0)
@@ -59,53 +63,61 @@ class MultiDisplayBridge:
             self.displays[(player_idx, "vp")] = self._init_one(vp_pin)
             self.displays[(player_idx, "dev")] = self._init_one(dev_pin)
 
-    def _draw_resources(self, oled, player_idx: int, resources: dict[str, int]):
+    def _draw_resources(self, oled, player_idx, resources):
         total = 0
         for key in RESOURCE_ORDER:
             total += int(resources.get(key, 0) or 0)
 
         oled.fill(0)
-        oled.text(f"P{player_idx + 1} RES", 0, 0)
+        oled.text("P{} RES".format(player_idx + 1), 0, 0)
         oled.text(
-            f"W{resources.get('wood', 0)} B{resources.get('brick', 0)} S{resources.get('sheep', 0)}",
+            "W{} B{} S{}".format(
+                resources.get("wood", 0), resources.get("brick", 0), resources.get("sheep", 0)
+            ),
             0,
             14,
         )
         oled.text(
-            f"H{resources.get('wheat', 0)} O{resources.get('ore', 0)}",
+            "H{} O{}".format(resources.get("wheat", 0), resources.get("ore", 0)),
             0,
             28,
         )
-        oled.text(f"TOTAL {total}", 0, 46)
+        oled.text("TOTAL {}".format(total), 0, 46)
         oled.show()
 
-    def _draw_vp(self, oled, player_idx: int, vp: int):
+    def _draw_vp(self, oled, player_idx, vp):
         oled.fill(0)
-        oled.text(f"P{player_idx + 1} VP", 0, 0)
-        oled.text(f"POINTS: {int(vp)}", 0, 20)
+        oled.text("P{} VP".format(player_idx + 1), 0, 0)
+        oled.text("POINTS: {}".format(int(vp)), 0, 20)
         oled.show()
 
-    def _draw_dev(self, oled, player_idx: int, dev_cards: dict[str, int]):
+    def _draw_dev(self, oled, player_idx, dev_cards):
         total = 0
         for key in DEV_ORDER:
             total += int(dev_cards.get(key, 0) or 0)
 
         oled.fill(0)
-        oled.text(f"P{player_idx + 1} DEV", 0, 0)
+        oled.text("P{} DEV".format(player_idx + 1), 0, 0)
         oled.text(
-            f"K{dev_cards.get('knight', 0)} VP{dev_cards.get('victory_point', 0)} RB{dev_cards.get('road_building', 0)}",
+            "K{} VP{} RB{}".format(
+                dev_cards.get("knight", 0),
+                dev_cards.get("victory_point", 0),
+                dev_cards.get("road_building", 0),
+            ),
             0,
             14,
         )
         oled.text(
-            f"Y{dev_cards.get('year_of_plenty', 0)} M{dev_cards.get('monopoly', 0)}",
+            "Y{} M{}".format(
+                dev_cards.get("year_of_plenty", 0), dev_cards.get("monopoly", 0)
+            ),
             0,
             28,
         )
-        oled.text(f"TOTAL {total}", 0, 46)
+        oled.text("TOTAL {}".format(total), 0, 46)
         oled.show()
 
-    def apply_snapshot(self, snapshot: dict):
+    def apply_snapshot(self, snapshot):
         players = snapshot.get("players", [])
         for player_idx in range(3):
             if player_idx >= len(players):
@@ -121,38 +133,39 @@ class MultiDisplayBridge:
 
 
 BRIDGE = MultiDisplayBridge()
+UART_LINK = UART(UART_ID, baudrate=UART_BAUD, tx=Pin(UART_TX_PIN), rx=Pin(UART_RX_PIN))
 
 
-def apply_snapshot_packet(packet: bytes):
-    """Primary entrypoint for your future Pi->Pico ingress layer."""
+def apply_snapshot_packet(packet):
     snapshot = decode_snapshot(packet)
     BRIDGE.apply_snapshot(snapshot)
 
 
-def _parse_hex_line(line: str) -> bytes:
-    parts = line.strip().split()
-    if not parts:
-        return b""
-    return bytes(int(part, 16) for part in parts)
+def uart_packet_loop():
+    print("DISPLAY BRIDGE READY (UART)")
+    buf = bytearray()
 
-
-def stdin_hex_test_loop():
-    """Development helper: paste packet bytes as hex to test rendering logic."""
-    print("DISPLAY BRIDGE READY")
-    print("stdin hex mode: one packet per line")
     while True:
-        raw = sys.stdin.readline()
-        if not raw:
+        if UART_LINK.any():
+            chunk = UART_LINK.read(UART_LINK.any())
+            if chunk:
+                buf.extend(chunk)
+
+        # Sync to magic byte at buffer start.
+        while len(buf) > 0 and buf[0] != MAGIC:
+            del buf[0]
+
+        if len(buf) < PACKET_SIZE:
             continue
-        raw = raw.strip()
-        if not raw:
-            continue
+
+        packet = bytes(buf[:PACKET_SIZE])
+        del buf[:PACKET_SIZE]
+
         try:
-            packet = _parse_hex_line(raw)
             apply_snapshot_packet(packet)
-            print("OK")
-        except Exception as exc:
-            print("ERR", exc)
+        except Exception:
+            # Keep running even if one packet is malformed.
+            pass
 
 
-stdin_hex_test_loop()
+uart_packet_loop()
