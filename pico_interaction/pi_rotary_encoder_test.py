@@ -45,8 +45,7 @@ def main():
                 print("count =", count)
                 print(GPIO.input(ENC_DT_PIN))
                 last_clk = clk_now
-            print(GPIO.input(ENC_DT_PIN))
-            print(GPIO.input(ENC_CLK_PIN))
+            print(GPIO.input(ENC_DT_PIN), GPIO.input(ENC_CLK_PIN))
 
             btn_now = GPIO.input(ENC_SW_PIN)
             now = time.monotonic()
