@@ -1,6 +1,9 @@
-﻿import argparse
+import argparse
 import json
+import os
 import random
+import subprocess
+import sys
 from pathlib import Path
 from typing import Any, Callable
 
@@ -68,6 +71,17 @@ def parse_args() -> argparse.Namespace:
         "--hsv-profile",
         default=None,
         help="Optional JSON file mapping color names to HSV triplets.",
+    )
+    parser.add_argument(
+        "--no-big-screen",
+        action="store_true",
+        help="Disable automatic launch of big screen HDMI viewer.",
+    )
+    parser.add_argument(
+        "--big-screen-poll-ms",
+        type=int,
+        default=700,
+        help="Refresh interval for big screen viewer in milliseconds.",
     )
     return parser.parse_args()
 
@@ -190,6 +204,54 @@ def build_detect_callback(args: argparse.Namespace) -> DetectBoardCallback:
         return fallback_callback
 
 
+def maybe_start_big_screen_viewer(
+    output_path: Path, args: argparse.Namespace
+) -> subprocess.Popen[Any] | None:
+    if args.no_big_screen:
+        return None
+
+    viewer_path = SCRIPT_DIR / "big_screen_testing" / "gui_controller.py"
+    if not viewer_path.exists():
+        print(f"[BIG-SCREEN] Viewer not found at {viewer_path}; continuing without it.")
+        return None
+
+    cmd = [
+        sys.executable,
+        str(viewer_path),
+        "--state-file",
+        str(output_path),
+        "--poll-ms",
+        str(args.big_screen_poll_ms),
+    ]
+    env = os.environ.copy()
+
+    if os.name != "nt" and hasattr(os, "getuid"):
+        uid = os.getuid()
+        runtime_dir = Path(f"/run/user/{uid}")
+        wayland_socket = runtime_dir / "wayland-0"
+
+        if runtime_dir.exists():
+            env.setdefault("XDG_RUNTIME_DIR", str(runtime_dir))
+        if wayland_socket.exists():
+            env.setdefault("WAYLAND_DISPLAY", "wayland-0")
+            env.setdefault("DISPLAY", ":0")
+        else:
+            env.setdefault("DISPLAY", ":0")
+
+        xauth = Path.home() / ".Xauthority"
+        if xauth.exists():
+            env.setdefault("XAUTHORITY", str(xauth))
+
+    try:
+        proc = subprocess.Popen(cmd, cwd=str(SCRIPT_DIR), env=env)
+    except Exception as exc:
+        print(f"[BIG-SCREEN] Failed to start viewer: {exc}")
+        return None
+
+    print(f"[BIG-SCREEN] Viewer started (pid={proc.pid}).")
+    return proc
+
+
 def main() -> None:
     args = parse_args()
     input_path = resolve_path(args.input)
@@ -200,14 +262,23 @@ def main() -> None:
     rng = random.Random(args.seed)
     detect_board_callback = build_detect_callback(args)
 
-    run_game_loop(
-        game_state=game_state,
-        hardware=hardware,
-        rng=rng,
-        max_turns=args.max_turns,
-        detect_board_callback=detect_board_callback,
-        save_snapshot_callback=lambda state: save_state(output_path, state),
-    )
+    viewer_process = maybe_start_big_screen_viewer(output_path, args)
+    try:
+        run_game_loop(
+            game_state=game_state,
+            hardware=hardware,
+            rng=rng,
+            max_turns=args.max_turns,
+            detect_board_callback=detect_board_callback,
+            save_snapshot_callback=lambda state: save_state(output_path, state),
+        )
+    finally:
+        if viewer_process is not None and viewer_process.poll() is None:
+            viewer_process.terminate()
+            try:
+                viewer_process.wait(timeout=2)
+            except subprocess.TimeoutExpired:
+                viewer_process.kill()
 
     save_state(output_path, game_state)
     print(f"Saved runtime state to {output_path}")
