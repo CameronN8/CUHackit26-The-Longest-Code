@@ -39,6 +39,7 @@ WIDTH = 128
 HEIGHT = 64
 FREQ = 400_000
 DISPLAY_ADDR_CANDIDATES = (0x3C, 0x3D)
+DEBUG_MENU_RX = True
 
 # Quick hardware debug mode:
 # - True: only initialize P1 menu display on SINGLE_MENU_SDA_PIN
@@ -90,6 +91,11 @@ class MultiDisplayBridge:
                 self.displays[(idx, "vp")] = None
                 self.displays[(idx, "menu")] = None
             self.displays[(0, "menu")] = self._init_one_display(SINGLE_MENU_SDA_PIN)
+            # Prove render path works before any UART traffic arrives.
+            self._draw_menu_lines(
+                self.displays[(0, "menu")],
+                ["P1 Action", ">Development", " Trading", " End Turn"],
+            )
             return
 
         for player_idx, pin_triplet in PLAYER_DISPLAY_PINS.items():
@@ -185,9 +191,18 @@ def uart_packet_loop():
                 buf = buf[MENU_RENDER_PACKET_SIZE:]
                 try:
                     payload = decode_menu_render(packet)
+                    if DEBUG_MENU_RX:
+                        print(
+                            "MENU_RX seq={} player={} lines={}".format(
+                                payload.get("seq", -1),
+                                payload.get("player_idx", -1),
+                                payload.get("lines", []),
+                            )
+                        )
                     BRIDGE.apply_menu_render(payload)
-                except Exception:
-                    pass
+                except Exception as exc:
+                    if DEBUG_MENU_RX:
+                        print("MENU_RX decode error:", exc)
                 continue
 
             if first == MAGIC:
