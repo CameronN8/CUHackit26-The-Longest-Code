@@ -122,7 +122,7 @@ class BigScreenViewer:
                         self.bank_resource_icons[resource] = bank_icon
 
         for face, filename in DICE_ICON_FILES.items():
-            icon = self._load_png_scaled(ASSETS_DIR / filename, max_px=128)
+            icon = self._load_png_scaled(ASSETS_DIR / filename, max_px=102)
             if icon is not None:
                 self.dice_icons[face] = icon
 
@@ -137,13 +137,14 @@ class BigScreenViewer:
 
     def _make_panel(self, parent: tk.Widget, title: str) -> tk.Frame:
         panel = tk.Frame(parent, bg=PANEL_BG, bd=1, relief="solid")
-        tk.Label(
-            panel,
-            text=title,
-            bg=PANEL_BG,
-            fg=TXT,
-            font=("Helvetica", 16, "bold"),
-        ).pack(anchor="center", pady=(10, 6))
+        if title:
+            tk.Label(
+                panel,
+                text=title,
+                bg=PANEL_BG,
+                fg=TXT,
+                font=("Helvetica", 16, "bold"),
+            ).pack(anchor="center", pady=(10, 6))
         return panel
 
     def _build_ui(self) -> None:
@@ -155,8 +156,8 @@ class BigScreenViewer:
 
         for col in range(3):
             grid.grid_columnconfigure(col, weight=1, uniform="col")
-        for row in range(2):
-            grid.grid_rowconfigure(row, weight=1, uniform="row")
+        grid.grid_rowconfigure(0, weight=3)
+        grid.grid_rowconfigure(1, weight=2)
 
         self.panel_top_left = self._make_panel(grid, "Resources Gained")
         self.panel_top_left.grid(row=0, column=0, sticky="nsew", padx=6, pady=6)
@@ -243,9 +244,9 @@ class BigScreenViewer:
         ).pack(anchor="center", pady=(2, 0))
 
         bank_body = tk.Frame(self.panel_top_right, bg=PANEL_BG)
-        bank_body.pack(fill="both", expand=True, padx=8, pady=(0, 4))
+        bank_body.pack(fill="both", expand=True, padx=8, pady=(0, 0))
         self.bank_grid = tk.Frame(bank_body, bg=PANEL_BG)
-        self.bank_grid.pack(expand=True)
+        self.bank_grid.pack(fill="both", expand=True)
 
         self.bank_card_vars: dict[str, tk.StringVar] = {
             "wood": tk.StringVar(value="-"),
@@ -328,11 +329,11 @@ class BigScreenViewer:
         self, parent: tk.Widget, row: int, col: int, key: str, value_var: tk.StringVar
     ) -> None:
         cell = tk.Frame(parent, bg="#ffffff", bd=1, relief="solid", padx=2, pady=2)
-        cell.grid(row=row, column=col, padx=4, pady=4, sticky="nsew")
+        cell.grid(row=row, column=col, padx=3, pady=3, sticky="nsew")
         parent.grid_columnconfigure(col, weight=1)
         parent.grid_rowconfigure(row, weight=1)
 
-        icon_holder = tk.Frame(cell, bg="#ffffff", width=132, height=126)
+        icon_holder = tk.Frame(cell, bg="#ffffff", width=132, height=146)
         icon_holder.pack(pady=(0, 0))
         icon_holder.pack_propagate(False)
 
@@ -340,7 +341,7 @@ class BigScreenViewer:
         if icon is not None:
             icon_label = tk.Label(icon_holder, image=icon, bg="#ffffff")
             icon_label.image = icon
-            icon_label.place(relx=0.5, rely=0.46, anchor="center")
+            icon_label.place(relx=0.5, rely=0.40, anchor="center")
         else:
             fallback = "Dev" if key == "dev" else key.title()
             tk.Label(
@@ -349,7 +350,7 @@ class BigScreenViewer:
                 bg="#ffffff",
                 fg=MUTED,
                 font=("Helvetica", 15, "bold"),
-            ).place(relx=0.5, rely=0.46, anchor="center")
+            ).place(relx=0.5, rely=0.40, anchor="center")
 
         count_label = tk.Label(
             cell,
@@ -358,7 +359,7 @@ class BigScreenViewer:
             fg=TXT,
             font=("Helvetica", 10, "bold"),
         )
-        count_label.place(relx=0.5, rely=1.0, x=0, y=-2, anchor="s")
+        count_label.place(relx=0.5, rely=1.0, x=0, y=-1, anchor="s")
         count_label.lift()
 
     def _render_gain_lines(self, players: list[dict], payouts: dict[str, dict[str, int]]) -> None:
