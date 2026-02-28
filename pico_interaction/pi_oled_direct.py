@@ -131,16 +131,16 @@ class PiDirectPlayerDisplays:
     def draw_resource_count(self, resources: dict[str, int], *, player_idx: int = 0) -> None:
         total = self._resource_total(resources)
         lines = [
-            f"P{player_idx + 1} RES",
-            f"W{resources.get('wood', 0)} B{resources.get('brick', 0)} S{resources.get('sheep', 0)}",
-            f"H{resources.get('wheat', 0)} O{resources.get('ore', 0)}",
-            f"TOTAL {total}",
+            f"Player {player_idx + 1} RES",
+            f"Wood: {resources.get('wood', 0)} Brick: {resources.get('brick', 0)} Sheep: {resources.get('sheep', 0)}",
+            f"Wheat: {resources.get('wheat', 0)} Ore: {resources.get('ore', 0)}",
+            f"TOTAL: {total}",
         ]
         self.resources.draw_lines(lines)
 
     def draw_victory_points(self, victory_points: int, *, player_idx: int = 0) -> None:
         lines = [
-            f"P{player_idx + 1} VP",
+            f"Player {player_idx + 1} Victory Points",
             "",
             f"POINTS: {int(victory_points)}",
             "",
