@@ -35,13 +35,16 @@ def _ensure_bank(game_state: dict[str, Any]) -> dict[str, Any]:
     return bank
 
 
-def allocate_resources_for_roll(game_state: dict[str, Any], roll_total: int) -> None:
+def allocate_resources_for_roll(
+    game_state: dict[str, Any], roll_total: int
+) -> dict[str, dict[str, int]]:
     if roll_total == 7:
-        return
+        return {}
 
     settlements = _settlements_by_id(game_state)
     players_by_color = _players_by_color(game_state)
     bank = _ensure_bank(game_state)
+    payouts: dict[str, dict[str, int]] = {}
 
     for tile in game_state.get("tiles", []):
         if tile.get("robber"):
@@ -73,6 +76,10 @@ def allocate_resources_for_roll(game_state: dict[str, Any], roll_total: int) -> 
 
             players_by_color[owner]["resources"][resource] += grant
             bank["resources"][resource] -= grant
+            payouts.setdefault(owner, {})
+            payouts[owner][resource] = int(payouts[owner].get(resource, 0)) + grant
+
+    return payouts
 
 
 def can_afford(player: dict[str, Any], cost: dict[str, int]) -> bool:
@@ -157,9 +164,10 @@ def run_player_turn(
     game["last_roll"] = {"die_1": die_1, "die_2": die_2, "total": total}
 
     if total == 7:
+        game["last_roll_payouts"] = {}
         _handle_roll_of_seven(game_state, color, hardware)
     else:
-        allocate_resources_for_roll(game_state, total)
+        game["last_roll_payouts"] = allocate_resources_for_roll(game_state, total)
 
     while True:
         action = hardware.get_turn_action(player, game_state)

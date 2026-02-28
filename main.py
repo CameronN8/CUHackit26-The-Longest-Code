@@ -14,6 +14,7 @@ SCRIPT_DIR = Path(__file__).resolve().parent
 
 
 DetectBoardCallback = Callable[[dict[str, Any], str, str | None], None]
+StateSnapshotCallback = Callable[[dict[str, Any]], None]
 
 
 def parse_args() -> argparse.Namespace:
@@ -103,11 +104,14 @@ def run_game_loop(
     rng: random.Random,
     max_turns: int,
     detect_board_callback: DetectBoardCallback,
+    save_snapshot_callback: StateSnapshotCallback | None = None,
 ) -> None:
     initialize_runtime_defaults(game_state)
 
     if game_state["game"]["phase"] == "setup":
         setup_phase.run_setup_phase(game_state, hardware, detect_board_callback)
+        if save_snapshot_callback:
+            save_snapshot_callback(game_state)
 
     turns_executed = 0
     while game_state["game"]["phase"] == "main":
@@ -116,11 +120,15 @@ def run_game_loop(
         if winner is not None:
             game_state["game"]["winner"] = winner["color"]
             game_state["game"]["phase"] = "ended"
+            if save_snapshot_callback:
+                save_snapshot_callback(game_state)
             break
 
         if turns_executed >= max_turns:
             game_state["game"]["phase"] = "paused"
             print(f"Reached max turns ({max_turns}). Pausing game loop.")
+            if save_snapshot_callback:
+                save_snapshot_callback(game_state)
             break
 
         current_idx = int(game_state["game"].get("current_player_index", 0))
@@ -143,6 +151,8 @@ def run_game_loop(
         game_state["game"]["current_player_index"] = next_idx
         game_state["game"]["turn_number"] = int(game_state["game"].get("turn_number", 1)) + 1
         turns_executed += 1
+        if save_snapshot_callback:
+            save_snapshot_callback(game_state)
 
     if game_state["game"]["phase"] == "ended":
         winner_color = game_state["game"]["winner"]
@@ -196,6 +206,7 @@ def main() -> None:
         rng=rng,
         max_turns=args.max_turns,
         detect_board_callback=detect_board_callback,
+        save_snapshot_callback=lambda state: save_state(output_path, state),
     )
 
     save_state(output_path, game_state)

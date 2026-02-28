@@ -4,7 +4,7 @@ set -euo pipefail
 # Launches this project's GUI app onto the Raspberry Pi's local HDMI desktop
 # even when triggered from a headless SSH shell.
 
-GUI_USER="${GUI_USER:-pi}"
+GUI_USER="${GUI_USER:-$(id -un)}"
 GUI_UID="$(id -u "$GUI_USER")"
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
 APP_ENTRY="${APP_ENTRY:-$SCRIPT_DIR/gui_controller.py}"
