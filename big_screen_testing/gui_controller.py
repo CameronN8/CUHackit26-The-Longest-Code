@@ -66,8 +66,10 @@ class BigScreenViewer:
 
         self.last_mtime_ns: int | None = None
         self.resource_icons: dict[str, tk.PhotoImage] = {}
+        self.bank_resource_icons: dict[str, tk.PhotoImage] = {}
         self.dice_icons: dict[int, tk.PhotoImage] = {}
         self.dev_icon: tk.PhotoImage | None = None
+        self.bank_dev_icon: tk.PhotoImage | None = None
 
         self.root.title("Catan Display")
         self.root.configure(bg=APP_BG)
@@ -120,6 +122,18 @@ class BigScreenViewer:
             if icon is not None:
                 self.dev_icon = icon
                 break
+
+        # Cards Remaining panel: use 2x icons without affecting Resources Gained sizing.
+        for resource, icon in self.resource_icons.items():
+            try:
+                self.bank_resource_icons[resource] = icon.zoom(2, 2)
+            except Exception:
+                self.bank_resource_icons[resource] = icon
+        if self.dev_icon is not None:
+            try:
+                self.bank_dev_icon = self.dev_icon.zoom(2, 2)
+            except Exception:
+                self.bank_dev_icon = self.dev_icon
 
     def _make_panel(self, parent: tk.Widget, title: str) -> tk.Frame:
         panel = tk.Frame(parent, bg=PANEL_BG, bd=1, relief="solid")
@@ -313,16 +327,16 @@ class BigScreenViewer:
     def _make_bank_card_cell(
         self, parent: tk.Widget, row: int, col: int, key: str, value_var: tk.StringVar
     ) -> None:
-        cell = tk.Frame(parent, bg="#ffffff", bd=1, relief="solid", padx=6, pady=5)
+        cell = tk.Frame(parent, bg="#ffffff", bd=1, relief="solid", padx=2, pady=2)
         cell.grid(row=row, column=col, padx=4, pady=4, sticky="nsew")
         parent.grid_columnconfigure(col, weight=1)
         parent.grid_rowconfigure(row, weight=1)
 
-        icon_holder = tk.Frame(cell, bg="#ffffff", width=92, height=92)
+        icon_holder = tk.Frame(cell, bg="#ffffff", width=126, height=126)
         icon_holder.pack(pady=(0, 0))
         icon_holder.pack_propagate(False)
 
-        icon = self.dev_icon if key == "dev" else self.resource_icons.get(key)
+        icon = self.bank_dev_icon if key == "dev" else self.bank_resource_icons.get(key)
         if icon is not None:
             icon_label = tk.Label(icon_holder, image=icon, bg="#ffffff")
             icon_label.image = icon
@@ -344,7 +358,7 @@ class BigScreenViewer:
             fg=TXT,
             font=("Helvetica", 14, "bold"),
         )
-        count_label.place(relx=1.0, rely=1.0, x=-2, y=-2, anchor="se")
+        count_label.place(relx=1.0, rely=1.0, x=-1, y=-1, anchor="se")
         count_label.lift()
 
     def _render_gain_lines(self, players: list[dict], payouts: dict[str, dict[str, int]]) -> None:
