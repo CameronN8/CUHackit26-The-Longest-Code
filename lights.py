@@ -10,11 +10,17 @@ class clock:
         self._running = False
         self._thread = None
 
+        self.count = 0
+
     def _run(self):
         while self._running:
-            self.output.on()
-            sleep(self.delay)
-            self.output.off()
+            count = count + 1
+            if count == 1:
+                self.output.on()
+            else:
+                self.output.off()
+            if count == 19:
+                count = 0
             sleep(self.delay)
 
     def start(self):
