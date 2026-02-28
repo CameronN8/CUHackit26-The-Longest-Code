@@ -276,7 +276,7 @@ class BigScreenViewer:
                 fg=TXT,
                 font=("Helvetica", 18, "bold"),
             )
-            title_label.pack(anchor="center", pady=(10, 6))
+            title_label.pack(anchor="center", pady=(8, 2))
             self.player_title_labels.append(title_label)
 
             body = tk.Frame(panel, bg=PANEL_BG)
@@ -293,7 +293,7 @@ class BigScreenViewer:
                 bg=PANEL_BG,
                 fg=TXT,
                 font=("Helvetica", 17, "bold"),
-            ).pack(anchor="center", pady=(30, 10))
+            ).pack(anchor="center", pady=(12, 8))
             tk.Label(
                 body,
                 textvariable=d_var,
@@ -333,7 +333,7 @@ class BigScreenViewer:
         parent.grid_columnconfigure(col, weight=1)
         parent.grid_rowconfigure(row, weight=1)
 
-        icon_holder = tk.Frame(cell, bg="#ffffff", width=132, height=110)
+        icon_holder = tk.Frame(cell, bg="#ffffff", width=132, height=100)
         icon_holder.pack(pady=(0, 0))
         icon_holder.pack_propagate(False)
 
