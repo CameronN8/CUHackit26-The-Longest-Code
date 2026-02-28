@@ -140,9 +140,9 @@ class PiDirectPlayerDisplays:
 
     def draw_victory_points(self, victory_points: int, *, player_idx: int = 0) -> None:
         lines = [
-            f"Player {player_idx + 1} Victory Points",
+            f"Player {player_idx + 1} VP",
             "",
-            f"POINTS: {int(victory_points)}",
+            f"Victory Points: {int(victory_points)}",
             "",
         ]
         self.vp.draw_lines(lines)
