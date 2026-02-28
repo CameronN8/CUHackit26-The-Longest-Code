@@ -333,7 +333,7 @@ class BigScreenViewer:
         parent.grid_columnconfigure(col, weight=1)
         parent.grid_rowconfigure(row, weight=1)
 
-        icon_holder = tk.Frame(cell, bg="#ffffff", width=132, height=146)
+        icon_holder = tk.Frame(cell, bg="#ffffff", width=132, height=110)
         icon_holder.pack(pady=(0, 0))
         icon_holder.pack_propagate(False)
 
