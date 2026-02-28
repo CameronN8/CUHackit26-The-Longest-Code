@@ -23,8 +23,8 @@
         "x": 189,
         "y": 116
       },
-      "type": null,
-      "color": null
+      "type": "settlement",
+      "color": "red"
     },
     {
       "id": 2,
@@ -75,8 +75,8 @@
         "x": 91,
         "y": 180
       },
-      "type": null,
-      "color": null
+      "type": "settlement",
+      "color": "red"
     },
     {
       "id": 6,
@@ -114,8 +114,8 @@
         "x": 394,
         "y": 172
       },
-      "type": null,
-      "color": null
+      "type": "settlement",
+      "color": "red"
     },
     {
       "id": 9,
@@ -127,8 +127,8 @@
         "x": 447,
         "y": 173
       },
-      "type": null,
-      "color": null
+      "type": "settlement",
+      "color": "red"
     },
     {
       "id": 10,
@@ -153,8 +153,8 @@
         "x": 49,
         "y": 203
       },
-      "type": null,
-      "color": null
+      "type": "settlement",
+      "color": "red"
     },
     {
       "id": 12,
