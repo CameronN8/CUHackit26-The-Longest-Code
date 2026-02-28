@@ -150,11 +150,81 @@ def trade_with_bank(
     return True
 
 
-def _handle_roll_of_seven(game_state: dict[str, Any], active_player_color: str, hardware) -> None:
-    # TODO: implement full 7 logic (discard half for >7 cards, move robber, steal card).
-    hardware.display_lcd_message(
-        f"{active_player_color} rolled 7: robber flow TODO (skeleton)."
-    )
+def _total_resource_cards(player: dict[str, Any]) -> int:
+    resources = player.get("resources", {})
+    return sum(int(resources.get(resource, 0) or 0) for resource in RESOURCE_KEYS)
+
+
+def _discard_random_resources_to_bank(
+    game_state: dict[str, Any], player: dict[str, Any], discard_count: int, rng: random.Random
+) -> dict[str, int]:
+    if discard_count <= 0:
+        return {}
+
+    resources = player.get("resources", {})
+    bank = _ensure_bank(game_state)
+    discarded: dict[str, int] = {}
+
+    while discard_count > 0:
+        available_types = []
+        available_total = 0
+        for resource in RESOURCE_KEYS:
+            count = int(resources.get(resource, 0) or 0)
+            if count <= 0:
+                continue
+            available_types.append((resource, count))
+            available_total += count
+
+        if available_total <= 0:
+            break
+
+        # Weighted random pick by card count (each card equally likely).
+        pick = rng.randint(1, available_total)
+        running = 0
+        chosen_resource = available_types[0][0]
+        for resource, count in available_types:
+            running += count
+            if pick <= running:
+                chosen_resource = resource
+                break
+
+        resources[chosen_resource] = int(resources.get(chosen_resource, 0) or 0) - 1
+        bank["resources"][chosen_resource] = int(bank["resources"].get(chosen_resource, 0) or 0) + 1
+        discarded[chosen_resource] = int(discarded.get(chosen_resource, 0)) + 1
+        discard_count -= 1
+
+    return discarded
+
+
+def _handle_roll_of_seven(
+    game_state: dict[str, Any], active_player_color: str, hardware, rng: random.Random
+) -> None:
+    # Per project requirement: players with >=7 cards discard floor(total/2).
+    discards_by_player: dict[str, dict[str, int]] = {}
+
+    for player in game_state.get("players", []):
+        if not isinstance(player, dict):
+            continue
+
+        color = str(player.get("color", "unknown"))
+        total_cards = _total_resource_cards(player)
+        if total_cards < 7:
+            continue
+
+        discard_count = total_cards // 2
+        discarded = _discard_random_resources_to_bank(
+            game_state=game_state, player=player, discard_count=discard_count, rng=rng
+        )
+        discards_by_player[color] = discarded
+
+    game = game_state.setdefault("game", {})
+    game["last_robber_discards"] = discards_by_player
+
+    if discards_by_player:
+        affected = ", ".join(sorted(discards_by_player.keys()))
+        hardware.display_lcd_message(f"{active_player_color} rolled 7: discard {affected}")
+    else:
+        hardware.display_lcd_message(f"{active_player_color} rolled 7: no discards")
 
 
 def run_player_turn(
@@ -179,7 +249,7 @@ def run_player_turn(
 
     if total == 7:
         game["last_roll_payouts"] = {}
-        _handle_roll_of_seven(game_state, color, hardware)
+        _handle_roll_of_seven(game_state, color, hardware, rng)
     else:
         game["last_roll_payouts"] = allocate_resources_for_roll(game_state, total)
 
