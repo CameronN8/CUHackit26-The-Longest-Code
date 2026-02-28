@@ -179,8 +179,8 @@
         "x": 195,
         "y": 202
       },
-      "type": null,
-      "color": null
+      "type": "settlement",
+      "color": "red"
     },
     {
       "id": 14,
