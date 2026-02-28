@@ -122,7 +122,7 @@ class BigScreenViewer:
                         self.bank_resource_icons[resource] = bank_icon
 
         for face, filename in DICE_ICON_FILES.items():
-            icon = self._load_png_scaled(ASSETS_DIR / filename, max_px=64)
+            icon = self._load_png_scaled(ASSETS_DIR / filename, max_px=128)
             if icon is not None:
                 self.dice_icons[face] = icon
 
@@ -167,13 +167,13 @@ class BigScreenViewer:
         self.panel_top_right = self._make_panel(grid, "Cards Remaining")
         self.panel_top_right.grid(row=0, column=2, sticky="nsew", padx=6, pady=6)
 
-        self.panel_bottom_1 = self._make_panel(grid, "Player 1")
+        self.panel_bottom_1 = self._make_panel(grid, "")
         self.panel_bottom_1.grid(row=1, column=0, sticky="nsew", padx=6, pady=6)
 
-        self.panel_bottom_2 = self._make_panel(grid, "Player 2")
+        self.panel_bottom_2 = self._make_panel(grid, "")
         self.panel_bottom_2.grid(row=1, column=1, sticky="nsew", padx=6, pady=6)
 
-        self.panel_bottom_3 = self._make_panel(grid, "Player 3")
+        self.panel_bottom_3 = self._make_panel(grid, "")
         self.panel_bottom_3.grid(row=1, column=2, sticky="nsew", padx=6, pady=6)
 
         self.gains_body = tk.Frame(self.panel_top_left, bg=PANEL_BG)
@@ -444,7 +444,7 @@ class BigScreenViewer:
     def _render_player_summaries(self, players: list[dict]) -> None:
         for idx in range(3):
             if idx >= len(players) or not isinstance(players[idx], dict):
-                self.player_title_labels[idx].configure(text=f"Player {idx + 1}")
+                self.player_title_labels[idx].configure(text="")
                 self.player_resource_vars[idx].set("Resources: -")
                 self.player_dev_vars[idx].set("Dev Cards: -")
                 continue

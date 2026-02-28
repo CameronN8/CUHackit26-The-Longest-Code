@@ -1,0 +1,2202 @@
+{
+  "settlements": [
+    {
+      "id": 0,
+      "coords": {
+        "x": 761,
+        "y": 80
+      },
+      "cameraCoords": {
+        "x": 106,
+        "y": 120
+      },
+      "type": "settlement",
+      "color": "red"
+    },
+    {
+      "id": 1,
+      "coords": {
+        "x": 860,
+        "y": 138
+      },
+      "cameraCoords": {
+        "x": 189,
+        "y": 116
+      },
+      "type": null,
+      "color": null
+    },
+    {
+      "id": 2,
+      "coords": {
+        "x": 860,
+        "y": 252
+      },
+      "cameraCoords": {
+        "x": 267,
+        "y": 110
+      },
+      "type": null,
+      "color": null
+    },
+    {
+      "id": 3,
+      "coords": {
+        "x": 761,
+        "y": 310
+      },
+      "cameraCoords": {
+        "x": 381,
+        "y": 111
+      },
+      "type": null,
+      "color": null
+    },
+    {
+      "id": 4,
+      "coords": {
+        "x": 661,
+        "y": 252
+      },
+      "cameraCoords": {
+        "x": 492,
+        "y": 105
+      },
+      "type": null,
+      "color": null
+    },
+    {
+      "id": 5,
+      "coords": {
+        "x": 661,
+        "y": 138
+      },
+      "cameraCoords": {
+        "x": 91,
+        "y": 180
+      },
+      "type": null,
+      "color": null
+    },
+    {
+      "id": 6,
+      "coords": {
+        "x": 960,
+        "y": 80
+      },
+      "cameraCoords": {
+        "x": 243,
+        "y": 172
+      },
+      "type": null,
+      "color": null
+    },
+    {
+      "id": 7,
+      "coords": {
+        "x": 1060,
+        "y": 138
+      },
+      "cameraCoords": {
+        "x": 300,
+        "y": 172
+      },
+      "type": null,
+      "color": null
+    },
+    {
+      "id": 8,
+      "coords": {
+        "x": 1060,
+        "y": 252
+      },
+      "cameraCoords": {
+        "x": 394,
+        "y": 172
+      },
+      "type": null,
+      "color": null
+    },
+    {
+      "id": 9,
+      "coords": {
+        "x": 960,
+        "y": 310
+      },
+      "cameraCoords": {
+        "x": 447,
+        "y": 173
+      },
+      "type": null,
+      "color": null
+    },
+    {
+      "id": 10,
+      "coords": {
+        "x": 1159,
+        "y": 80
+      },
+      "cameraCoords": {
+        "x": 538,
+        "y": 173
+      },
+      "type": null,
+      "color": null
+    },
+    {
+      "id": 11,
+      "coords": {
+        "x": 1259,
+        "y": 138
+      },
+      "cameraCoords": {
+        "x": 49,
+        "y": 203
+      },
+      "type": null,
+      "color": null
+    },
+    {
+      "id": 12,
+      "coords": {
+        "x": 1259,
+        "y": 252
+      },
+      "cameraCoords": {
+        "x": 143,
+        "y": 205
+      },
+      "type": null,
+      "color": null
+    },
+    {
+      "id": 13,
+      "coords": {
+        "x": 1159,
+        "y": 310
+      },
+      "cameraCoords": {
+        "x": 195,
+        "y": 202
+      },
+      "type": null,
+      "color": null
+    },
+    {
+      "id": 14,
+      "coords": {
+        "x": 761,
+        "y": 425
+      },
+      "cameraCoords": {
+        "x": 289,
+        "y": 200
+      },
+      "type": null,
+      "color": null
+    },
+    {
+      "id": 15,
+      "coords": {
+        "x": 661,
+        "y": 482
+      },
+      "cameraCoords": {
+        "x": 347,
+        "y": 201
+      },
+      "type": null,
+      "color": null
+    },
+    {
+      "id": 16,
+      "coords": {
+        "x": 562,
+        "y": 425
+      },
+      "cameraCoords": {
+        "x": 430,
+        "y": 197
+      },
+      "type": null,
+      "color": null
+    },
+    {
+      "id": 17,
+      "coords": {
+        "x": 562,
+        "y": 310
+      },
+      "cameraCoords": {
+        "x": 509,
+        "y": 197
+      },
+      "type": null,
+      "color": null
+    },
+    {
+      "id": 18,
+      "coords": {
+        "x": 960,
+        "y": 425
+      },
+      "cameraCoords": {
+        "x": 590,
+        "y": 194
+      },
+      "type": null,
+      "color": null
+    },
+    {
+      "id": 19,
+      "coords": {
+        "x": 860,
+        "y": 482
+      },
+      "cameraCoords": {
+        "x": 76,
+        "y": 248
+      },
+      "type": null,
+      "color": null
+    },
+    {
+      "id": 20,
+      "coords": {
+        "x": 1159,
+        "y": 425
+      },
+      "cameraCoords": {
+        "x": 187,
+        "y": 236
+      },
+      "type": null,
+      "color": null
+    },
+    {
+      "id": 21,
+      "coords": {
+        "x": 1060,
+        "y": 482
+      },
+      "cameraCoords": {
+        "x": 214,
+        "y": 235
+      },
+      "type": null,
+      "color": null
+    },
+    {
+      "id": 22,
+      "coords": {
+        "x": 1358,
+        "y": 310
+      },
+      "cameraCoords": {
+        "x": 303,
+        "y": 234
+      },
+      "type": null,
+      "color": null
+    },
+    {
+      "id": 23,
+      "coords": {
+        "x": 1358,
+        "y": 425
+      },
+      "cameraCoords": {
+        "x": 415,
+        "y": 233
+      },
+      "type": null,
+      "color": null
+    },
+    {
+      "id": 24,
+      "coords": {
+        "x": 1259,
+        "y": 482
+      },
+      "cameraCoords": {
+        "x": 464,
+        "y": 231
+      },
+      "type": null,
+      "color": null
+    },
+    {
+      "id": 25,
+      "coords": {
+        "x": 661,
+        "y": 598
+      },
+      "cameraCoords": {
+        "x": 532,
+        "y": 228
+      },
+      "type": null,
+      "color": null
+    },
+    {
+      "id": 26,
+      "coords": {
+        "x": 562,
+        "y": 655
+      },
+      "cameraCoords": {
+        "x": 70,
+        "y": 294
+      },
+      "type": null,
+      "color": null
+    },
+    {
+      "id": 27,
+      "coords": {
+        "x": 462,
+        "y": 598
+      },
+      "cameraCoords": {
+        "x": 167,
+        "y": 291
+      },
+      "type": null,
+      "color": null
+    },
+    {
+      "id": 28,
+      "coords": {
+        "x": 462,
+        "y": 482
+      },
+      "cameraCoords": {
+        "x": 281,
+        "y": 287
+      },
+      "type": null,
+      "color": null
+    },
+    {
+      "id": 29,
+      "coords": {
+        "x": 860,
+        "y": 598
+      },
+      "cameraCoords": {
+        "x": 410,
+        "y": 284
+      },
+      "type": null,
+      "color": null
+    },
+    {
+      "id": 30,
+      "coords": {
+        "x": 761,
+        "y": 655
+      },
+      "cameraCoords": {
+        "x": 505,
+        "y": 282
+      },
+      "type": null,
+      "color": null
+    },
+    {
+      "id": 31,
+      "coords": {
+        "x": 1060,
+        "y": 598
+      },
+      "cameraCoords": {
+        "x": 597,
+        "y": 281
+      },
+      "type": null,
+      "color": null
+    },
+    {
+      "id": 32,
+      "coords": {
+        "x": 960,
+        "y": 655
+      },
+      "cameraCoords": {
+        "x": 53,
+        "y": 338
+      },
+      "type": null,
+      "color": null
+    },
+    {
+      "id": 33,
+      "coords": {
+        "x": 1259,
+        "y": 598
+      },
+      "cameraCoords": {
+        "x": 93,
+        "y": 338
+      },
+      "type": null,
+      "color": null
+    },
+    {
+      "id": 34,
+      "coords": {
+        "x": 1159,
+        "y": 655
+      },
+      "cameraCoords": {
+        "x": 185,
+        "y": 333
+      },
+      "type": null,
+      "color": null
+    },
+    {
+      "id": 35,
+      "coords": {
+        "x": 1458,
+        "y": 482
+      },
+      "cameraCoords": {
+        "x": 257,
+        "y": 329
+      },
+      "type": null,
+      "color": null
+    },
+    {
+      "id": 36,
+      "coords": {
+        "x": 1458,
+        "y": 598
+      },
+      "cameraCoords": {
+        "x": 336,
+        "y": 329
+      },
+      "type": null,
+      "color": null
+    },
+    {
+      "id": 37,
+      "coords": {
+        "x": 1358,
+        "y": 655
+      },
+      "cameraCoords": {
+        "x": 425,
+        "y": 328
+      },
+      "type": null,
+      "color": null
+    },
+    {
+      "id": 38,
+      "coords": {
+        "x": 761,
+        "y": 770
+      },
+      "cameraCoords": {
+        "x": 510,
+        "y": 326
+      },
+      "type": null,
+      "color": null
+    },
+    {
+      "id": 39,
+      "coords": {
+        "x": 661,
+        "y": 828
+      },
+      "cameraCoords": {
+        "x": 42,
+        "y": 365
+      },
+      "type": null,
+      "color": null
+    },
+    {
+      "id": 40,
+      "coords": {
+        "x": 562,
+        "y": 770
+      },
+      "cameraCoords": {
+        "x": 103,
+        "y": 362
+      },
+      "type": null,
+      "color": null
+    },
+    {
+      "id": 41,
+      "coords": {
+        "x": 960,
+        "y": 770
+      },
+      "cameraCoords": {
+        "x": 180,
+        "y": 356
+      },
+      "type": null,
+      "color": null
+    },
+    {
+      "id": 42,
+      "coords": {
+        "x": 860,
+        "y": 828
+      },
+      "cameraCoords": {
+        "x": 270,
+        "y": 350
+      },
+      "type": null,
+      "color": null
+    },
+    {
+      "id": 43,
+      "coords": {
+        "x": 1159,
+        "y": 770
+      },
+      "cameraCoords": {
+        "x": 342,
+        "y": 348
+      },
+      "type": null,
+      "color": null
+    },
+    {
+      "id": 44,
+      "coords": {
+        "x": 1060,
+        "y": 828
+      },
+      "cameraCoords": {
+        "x": 436,
+        "y": 349
+      },
+      "type": null,
+      "color": null
+    },
+    {
+      "id": 45,
+      "coords": {
+        "x": 1358,
+        "y": 770
+      },
+      "cameraCoords": {
+        "x": 544,
+        "y": 346
+      },
+      "type": null,
+      "color": null
+    },
+    {
+      "id": 46,
+      "coords": {
+        "x": 1259,
+        "y": 828
+      },
+      "cameraCoords": {
+        "x": 132,
+        "y": 382
+      },
+      "type": null,
+      "color": null
+    },
+    {
+      "id": 47,
+      "coords": {
+        "x": 860,
+        "y": 942
+      },
+      "cameraCoords": {
+        "x": 157,
+        "y": 383
+      },
+      "type": null,
+      "color": null
+    },
+    {
+      "id": 48,
+      "coords": {
+        "x": 761,
+        "y": 1000
+      },
+      "cameraCoords": {
+        "x": 265,
+        "y": 377
+      },
+      "type": null,
+      "color": null
+    },
+    {
+      "id": 49,
+      "coords": {
+        "x": 661,
+        "y": 942
+      },
+      "cameraCoords": {
+        "x": 343,
+        "y": 375
+      },
+      "type": null,
+      "color": null
+    },
+    {
+      "id": 50,
+      "coords": {
+        "x": 1060,
+        "y": 942
+      },
+      "cameraCoords": {
+        "x": 414,
+        "y": 368
+      },
+      "type": null,
+      "color": null
+    },
+    {
+      "id": 51,
+      "coords": {
+        "x": 960,
+        "y": 1000
+      },
+      "cameraCoords": {
+        "x": 505,
+        "y": 364
+      },
+      "type": null,
+      "color": null
+    },
+    {
+      "id": 52,
+      "coords": {
+        "x": 1259,
+        "y": 942
+      },
+      "cameraCoords": {
+        "x": 123,
+        "y": 413
+      },
+      "type": null,
+      "color": null
+    },
+    {
+      "id": 53,
+      "coords": {
+        "x": 1159,
+        "y": 1000
+      },
+      "cameraCoords": {
+        "x": 218,
+        "y": 410
+      },
+      "type": null,
+      "color": null
+    }
+  ],
+  "roads": [
+    {
+      "coords": {
+        "x": 811,
+        "y": 109
+      },
+      "cameraCoords": {
+        "x": 148,
+        "y": 104
+      },
+      "color": null,
+      "a": 0,
+      "b": 1
+    },
+    {
+      "coords": {
+        "x": 711,
+        "y": 109
+      },
+      "cameraCoords": {
+        "x": 239,
+        "y": 115
+      },
+      "color": null,
+      "a": 0,
+      "b": 5
+    },
+    {
+      "coords": {
+        "x": 860,
+        "y": 195
+      },
+      "cameraCoords": {
+        "x": 289,
+        "y": 105
+      },
+      "color": null,
+      "a": 1,
+      "b": 2
+    },
+    {
+      "coords": {
+        "x": 910,
+        "y": 109
+      },
+      "cameraCoords": {
+        "x": 342,
+        "y": 100
+      },
+      "color": null,
+      "a": 1,
+      "b": 6
+    },
+    {
+      "coords": {
+        "x": 811,
+        "y": 281
+      },
+      "cameraCoords": {
+        "x": 446,
+        "y": 95
+      },
+      "color": null,
+      "a": 2,
+      "b": 3
+    },
+    {
+      "coords": {
+        "x": 910,
+        "y": 281
+      },
+      "cameraCoords": {
+        "x": 566,
+        "y": 101
+      },
+      "color": null,
+      "a": 2,
+      "b": 9
+    },
+    {
+      "coords": {
+        "x": 711,
+        "y": 281
+      },
+      "cameraCoords": {
+        "x": 91,
+        "y": 150
+      },
+      "color": null,
+      "a": 3,
+      "b": 4
+    },
+    {
+      "coords": {
+        "x": 761,
+        "y": 368
+      },
+      "cameraCoords": {
+        "x": 139,
+        "y": 150
+      },
+      "color": null,
+      "a": 3,
+      "b": 14
+    },
+    {
+      "coords": {
+        "x": 661,
+        "y": 195
+      },
+      "cameraCoords": {
+        "x": 237,
+        "y": 152
+      },
+      "color": null,
+      "a": 4,
+      "b": 5
+    },
+    {
+      "coords": {
+        "x": 611,
+        "y": 281
+      },
+      "cameraCoords": {
+        "x": 300,
+        "y": 148
+      },
+      "color": null,
+      "a": 4,
+      "b": 17
+    },
+    {
+      "coords": {
+        "x": 1010,
+        "y": 109
+      },
+      "cameraCoords": {
+        "x": 366,
+        "y": 146
+      },
+      "color": null,
+      "a": 6,
+      "b": 7
+    },
+    {
+      "coords": {
+        "x": 1060,
+        "y": 195
+      },
+      "cameraCoords": {
+        "x": 447,
+        "y": 146
+      },
+      "color": null,
+      "a": 7,
+      "b": 8
+    },
+    {
+      "coords": {
+        "x": 1109,
+        "y": 109
+      },
+      "cameraCoords": {
+        "x": 535,
+        "y": 147
+      },
+      "color": null,
+      "a": 7,
+      "b": 10
+    },
+    {
+      "coords": {
+        "x": 1010,
+        "y": 281
+      },
+      "cameraCoords": {
+        "x": 85,
+        "y": 188
+      },
+      "color": null,
+      "a": 8,
+      "b": 9
+    },
+    {
+      "coords": {
+        "x": 1109,
+        "y": 281
+      },
+      "cameraCoords": {
+        "x": 137,
+        "y": 184
+      },
+      "color": null,
+      "a": 8,
+      "b": 13
+    },
+    {
+      "coords": {
+        "x": 960,
+        "y": 368
+      },
+      "cameraCoords": {
+        "x": 216,
+        "y": 184
+      },
+      "color": null,
+      "a": 9,
+      "b": 18
+    },
+    {
+      "coords": {
+        "x": 1209,
+        "y": 109
+      },
+      "cameraCoords": {
+        "x": 288,
+        "y": 178
+      },
+      "color": null,
+      "a": 10,
+      "b": 11
+    },
+    {
+      "coords": {
+        "x": 1259,
+        "y": 195
+      },
+      "cameraCoords": {
+        "x": 397,
+        "y": 182
+      },
+      "color": null,
+      "a": 11,
+      "b": 12
+    },
+    {
+      "coords": {
+        "x": 1209,
+        "y": 281
+      },
+      "cameraCoords": {
+        "x": 469,
+        "y": 183
+      },
+      "color": null,
+      "a": 12,
+      "b": 13
+    },
+    {
+      "coords": {
+        "x": 1309,
+        "y": 281
+      },
+      "cameraCoords": {
+        "x": 523,
+        "y": 180
+      },
+      "color": null,
+      "a": 12,
+      "b": 22
+    },
+    {
+      "coords": {
+        "x": 1159,
+        "y": 368
+      },
+      "cameraCoords": {
+        "x": 61,
+        "y": 225
+      },
+      "color": null,
+      "a": 13,
+      "b": 20
+    },
+    {
+      "coords": {
+        "x": 711,
+        "y": 454
+      },
+      "cameraCoords": {
+        "x": 111,
+        "y": 225
+      },
+      "color": null,
+      "a": 14,
+      "b": 15
+    },
+    {
+      "coords": {
+        "x": 811,
+        "y": 454
+      },
+      "cameraCoords": {
+        "x": 176,
+        "y": 227
+      },
+      "color": null,
+      "a": 14,
+      "b": 19
+    },
+    {
+      "coords": {
+        "x": 611,
+        "y": 454
+      },
+      "cameraCoords": {
+        "x": 262,
+        "y": 229
+      },
+      "color": null,
+      "a": 15,
+      "b": 16
+    },
+    {
+      "coords": {
+        "x": 661,
+        "y": 540
+      },
+      "cameraCoords": {
+        "x": 329,
+        "y": 229
+      },
+      "color": null,
+      "a": 15,
+      "b": 25
+    },
+    {
+      "coords": {
+        "x": 562,
+        "y": 368
+      },
+      "cameraCoords": {
+        "x": 442,
+        "y": 225
+      },
+      "color": null,
+      "a": 16,
+      "b": 17
+    },
+    {
+      "coords": {
+        "x": 512,
+        "y": 454
+      },
+      "cameraCoords": {
+        "x": 525,
+        "y": 228
+      },
+      "color": null,
+      "a": 16,
+      "b": 28
+    },
+    {
+      "coords": {
+        "x": 910,
+        "y": 454
+      },
+      "cameraCoords": {
+        "x": 7,
+        "y": 266
+      },
+      "color": null,
+      "a": 18,
+      "b": 19
+    },
+    {
+      "coords": {
+        "x": 1010,
+        "y": 454
+      },
+      "cameraCoords": {
+        "x": 71,
+        "y": 267
+      },
+      "color": null,
+      "a": 18,
+      "b": 21
+    },
+    {
+      "coords": {
+        "x": 860,
+        "y": 540
+      },
+      "cameraCoords": {
+        "x": 157,
+        "y": 267
+      },
+      "color": null,
+      "a": 19,
+      "b": 29
+    },
+    {
+      "coords": {
+        "x": 1109,
+        "y": 454
+      },
+      "cameraCoords": {
+        "x": 253,
+        "y": 266
+      },
+      "color": null,
+      "a": 20,
+      "b": 21
+    },
+    {
+      "coords": {
+        "x": 1209,
+        "y": 454
+      },
+      "cameraCoords": {
+        "x": 354,
+        "y": 267
+      },
+      "color": null,
+      "a": 20,
+      "b": 24
+    },
+    {
+      "coords": {
+        "x": 1060,
+        "y": 540
+      },
+      "cameraCoords": {
+        "x": 434,
+        "y": 266
+      },
+      "color": null,
+      "a": 21,
+      "b": 31
+    },
+    {
+      "coords": {
+        "x": 1358,
+        "y": 368
+      },
+      "cameraCoords": {
+        "x": 493,
+        "y": 266
+      },
+      "color": null,
+      "a": 22,
+      "b": 23
+    },
+    {
+      "coords": {
+        "x": 1309,
+        "y": 454
+      },
+      "cameraCoords": {
+        "x": 105,
+        "y": 300
+      },
+      "color": null,
+      "a": 23,
+      "b": 24
+    },
+    {
+      "coords": {
+        "x": 1408,
+        "y": 454
+      },
+      "cameraCoords": {
+        "x": 148,
+        "y": 300
+      },
+      "color": null,
+      "a": 23,
+      "b": 35
+    },
+    {
+      "coords": {
+        "x": 1259,
+        "y": 540
+      },
+      "cameraCoords": {
+        "x": 223,
+        "y": 300
+      },
+      "color": null,
+      "a": 24,
+      "b": 33
+    },
+    {
+      "coords": {
+        "x": 611,
+        "y": 626
+      },
+      "cameraCoords": {
+        "x": 301,
+        "y": 303
+      },
+      "color": null,
+      "a": 25,
+      "b": 26
+    },
+    {
+      "coords": {
+        "x": 711,
+        "y": 626
+      },
+      "cameraCoords": {
+        "x": 379,
+        "y": 306
+      },
+      "color": null,
+      "a": 25,
+      "b": 30
+    },
+    {
+      "coords": {
+        "x": 512,
+        "y": 626
+      },
+      "cameraCoords": {
+        "x": 442,
+        "y": 308
+      },
+      "color": null,
+      "a": 26,
+      "b": 27
+    },
+    {
+      "coords": {
+        "x": 562,
+        "y": 712
+      },
+      "cameraCoords": {
+        "x": 511,
+        "y": 306
+      },
+      "color": null,
+      "a": 26,
+      "b": 40
+    },
+    {
+      "coords": {
+        "x": 462,
+        "y": 540
+      },
+      "cameraCoords": {
+        "x": 56,
+        "y": 342
+      },
+      "color": null,
+      "a": 27,
+      "b": 28
+    },
+    {
+      "coords": {
+        "x": 811,
+        "y": 626
+      },
+      "cameraCoords": {
+        "x": 119,
+        "y": 345
+      },
+      "color": null,
+      "a": 29,
+      "b": 30
+    },
+    {
+      "coords": {
+        "x": 910,
+        "y": 626
+      },
+      "cameraCoords": {
+        "x": 238,
+        "y": 345
+      },
+      "color": null,
+      "a": 29,
+      "b": 32
+    },
+    {
+      "coords": {
+        "x": 761,
+        "y": 712
+      },
+      "cameraCoords": {
+        "x": 332,
+        "y": 344
+      },
+      "color": null,
+      "a": 30,
+      "b": 38
+    },
+    {
+      "coords": {
+        "x": 1010,
+        "y": 626
+      },
+      "cameraCoords": {
+        "x": 403,
+        "y": 342
+      },
+      "color": null,
+      "a": 31,
+      "b": 32
+    },
+    {
+      "coords": {
+        "x": 1109,
+        "y": 626
+      },
+      "cameraCoords": {
+        "x": 472,
+        "y": 339
+      },
+      "color": null,
+      "a": 31,
+      "b": 34
+    },
+    {
+      "coords": {
+        "x": 960,
+        "y": 712
+      },
+      "cameraCoords": {
+        "x": 535,
+        "y": 344
+      },
+      "color": null,
+      "a": 32,
+      "b": 41
+    },
+    {
+      "coords": {
+        "x": 1209,
+        "y": 626
+      },
+      "cameraCoords": {
+        "x": 62,
+        "y": 366
+      },
+      "color": null,
+      "a": 33,
+      "b": 34
+    },
+    {
+      "coords": {
+        "x": 1309,
+        "y": 626
+      },
+      "cameraCoords": {
+        "x": 116,
+        "y": 369
+      },
+      "color": null,
+      "a": 33,
+      "b": 37
+    },
+    {
+      "coords": {
+        "x": 1159,
+        "y": 712
+      },
+      "cameraCoords": {
+        "x": 206,
+        "y": 372
+      },
+      "color": null,
+      "a": 34,
+      "b": 43
+    },
+    {
+      "coords": {
+        "x": 1458,
+        "y": 540
+      },
+      "cameraCoords": {
+        "x": 300,
+        "y": 373
+      },
+      "color": null,
+      "a": 35,
+      "b": 36
+    },
+    {
+      "coords": {
+        "x": 1408,
+        "y": 626
+      },
+      "cameraCoords": {
+        "x": 377,
+        "y": 374
+      },
+      "color": null,
+      "a": 36,
+      "b": 37
+    },
+    {
+      "coords": {
+        "x": 1358,
+        "y": 712
+      },
+      "cameraCoords": {
+        "x": 440,
+        "y": 365
+      },
+      "color": null,
+      "a": 37,
+      "b": 45
+    },
+    {
+      "coords": {
+        "x": 711,
+        "y": 799
+      },
+      "cameraCoords": {
+        "x": 484,
+        "y": 359
+      },
+      "color": null,
+      "a": 38,
+      "b": 39
+    },
+    {
+      "coords": {
+        "x": 811,
+        "y": 799
+      },
+      "cameraCoords": {
+        "x": 117,
+        "y": 371
+      },
+      "color": null,
+      "a": 38,
+      "b": 42
+    },
+    {
+      "coords": {
+        "x": 611,
+        "y": 799
+      },
+      "cameraCoords": {
+        "x": 181,
+        "y": 374
+      },
+      "color": null,
+      "a": 39,
+      "b": 40
+    },
+    {
+      "coords": {
+        "x": 661,
+        "y": 885
+      },
+      "cameraCoords": {
+        "x": 271,
+        "y": 374
+      },
+      "color": null,
+      "a": 39,
+      "b": 49
+    },
+    {
+      "coords": {
+        "x": 910,
+        "y": 799
+      },
+      "cameraCoords": {
+        "x": 363,
+        "y": 373
+      },
+      "color": null,
+      "a": 41,
+      "b": 42
+    },
+    {
+      "coords": {
+        "x": 1010,
+        "y": 799
+      },
+      "cameraCoords": {
+        "x": 428,
+        "y": 369
+      },
+      "color": null,
+      "a": 41,
+      "b": 44
+    },
+    {
+      "coords": {
+        "x": 860,
+        "y": 885
+      },
+      "cameraCoords": {
+        "x": 485,
+        "y": 368
+      },
+      "color": null,
+      "a": 42,
+      "b": 47
+    },
+    {
+      "coords": {
+        "x": 1109,
+        "y": 799
+      },
+      "cameraCoords": {
+        "x": 526,
+        "y": 366
+      },
+      "color": null,
+      "a": 43,
+      "b": 44
+    },
+    {
+      "coords": {
+        "x": 1209,
+        "y": 799
+      },
+      "cameraCoords": {
+        "x": 591,
+        "y": 368
+      },
+      "color": null,
+      "a": 43,
+      "b": 46
+    },
+    {
+      "coords": {
+        "x": 1060,
+        "y": 885
+      },
+      "cameraCoords": {
+        "x": 76,
+        "y": 376
+      },
+      "color": null,
+      "a": 44,
+      "b": 50
+    },
+    {
+      "coords": {
+        "x": 1309,
+        "y": 799
+      },
+      "cameraCoords": {
+        "x": 163,
+        "y": 381
+      },
+      "color": null,
+      "a": 45,
+      "b": 46
+    },
+    {
+      "coords": {
+        "x": 1259,
+        "y": 885
+      },
+      "cameraCoords": {
+        "x": 252,
+        "y": 381
+      },
+      "color": null,
+      "a": 46,
+      "b": 52
+    },
+    {
+      "coords": {
+        "x": 811,
+        "y": 971
+      },
+      "cameraCoords": {
+        "x": 336,
+        "y": 377
+      },
+      "color": null,
+      "a": 47,
+      "b": 48
+    },
+    {
+      "coords": {
+        "x": 910,
+        "y": 971
+      },
+      "cameraCoords": {
+        "x": 426,
+        "y": 374
+      },
+      "color": null,
+      "a": 47,
+      "b": 51
+    },
+    {
+      "coords": {
+        "x": 711,
+        "y": 971
+      },
+      "cameraCoords": {
+        "x": 494,
+        "y": 372
+      },
+      "color": null,
+      "a": 48,
+      "b": 49
+    },
+    {
+      "coords": {
+        "x": 1010,
+        "y": 971
+      },
+      "cameraCoords": {
+        "x": 151,
+        "y": 401
+      },
+      "color": null,
+      "a": 50,
+      "b": 51
+    },
+    {
+      "coords": {
+        "x": 1109,
+        "y": 971
+      },
+      "cameraCoords": {
+        "x": 235,
+        "y": 405
+      },
+      "color": null,
+      "a": 50,
+      "b": 53
+    },
+    {
+      "coords": {
+        "x": 1209,
+        "y": 971
+      },
+      "cameraCoords": {
+        "x": 303,
+        "y": 407
+      },
+      "color": null,
+      "a": 52,
+      "b": 53
+    }
+  ],
+  "tiles": [
+    {
+      "coords": {
+        "x": 761,
+        "y": 195
+      },
+      "cameraCoords": {
+        "x": 123,
+        "y": 153
+      },
+      "resource_type": "wheat",
+      "roll_number": 9,
+      "robber": false,
+      "settlement_ids": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    },
+    {
+      "coords": {
+        "x": 960,
+        "y": 195
+      },
+      "cameraCoords": {
+        "x": 232,
+        "y": 154
+      },
+      "resource_type": "wheat",
+      "roll_number": 10,
+      "robber": false,
+      "settlement_ids": [
+        6,
+        7,
+        8,
+        9,
+        2,
+        1
+      ]
+    },
+    {
+      "coords": {
+        "x": 1159,
+        "y": 195
+      },
+      "cameraCoords": {
+        "x": 391,
+        "y": 153
+      },
+      "resource_type": "brick",
+      "roll_number": 8,
+      "robber": false,
+      "settlement_ids": [
+        10,
+        11,
+        12,
+        13,
+        8,
+        7
+      ]
+    },
+    {
+      "coords": {
+        "x": 661,
+        "y": 368
+      },
+      "cameraCoords": {
+        "x": 517,
+        "y": 148
+      },
+      "resource_type": "sheep",
+      "roll_number": 6,
+      "robber": false,
+      "settlement_ids": [
+        4,
+        3,
+        14,
+        15,
+        16,
+        17
+      ]
+    },
+    {
+      "coords": {
+        "x": 860,
+        "y": 368
+      },
+      "cameraCoords": {
+        "x": 141,
+        "y": 209
+      },
+      "resource_type": "brick",
+      "roll_number": 11,
+      "robber": false,
+      "settlement_ids": [
+        2,
+        9,
+        18,
+        19,
+        14,
+        3
+      ]
+    },
+    {
+      "coords": {
+        "x": 1060,
+        "y": 368
+      },
+      "cameraCoords": {
+        "x": 255,
+        "y": 223
+      },
+      "resource_type": "ore",
+      "roll_number": 3,
+      "robber": false,
+      "settlement_ids": [
+        8,
+        13,
+        20,
+        21,
+        18,
+        9
+      ]
+    },
+    {
+      "coords": {
+        "x": 1259,
+        "y": 368
+      },
+      "cameraCoords": {
+        "x": 357,
+        "y": 215
+      },
+      "resource_type": "ore",
+      "roll_number": 9,
+      "robber": false,
+      "settlement_ids": [
+        12,
+        22,
+        23,
+        24,
+        20,
+        13
+      ]
+    },
+    {
+      "coords": {
+        "x": 562,
+        "y": 540
+      },
+      "cameraCoords": {
+        "x": 497,
+        "y": 208
+      },
+      "resource_type": "brick",
+      "roll_number": 5,
+      "robber": false,
+      "settlement_ids": [
+        16,
+        15,
+        25,
+        26,
+        27,
+        28
+      ]
+    },
+    {
+      "coords": {
+        "x": 761,
+        "y": 540
+      },
+      "cameraCoords": {
+        "x": 154,
+        "y": 258
+      },
+      "resource_type": "wheat",
+      "roll_number": 11,
+      "robber": false,
+      "settlement_ids": [
+        14,
+        19,
+        29,
+        30,
+        25,
+        15
+      ]
+    },
+    {
+      "coords": {
+        "x": 960,
+        "y": 540
+      },
+      "cameraCoords": {
+        "x": 248,
+        "y": 271
+      },
+      "resource_type": "ore",
+      "roll_number": 3,
+      "robber": false,
+      "settlement_ids": [
+        18,
+        21,
+        31,
+        32,
+        29,
+        19
+      ]
+    },
+    {
+      "coords": {
+        "x": 1159,
+        "y": 540
+      },
+      "cameraCoords": {
+        "x": 366,
+        "y": 273
+      },
+      "resource_type": "sheep",
+      "roll_number": 2,
+      "robber": false,
+      "settlement_ids": [
+        20,
+        24,
+        33,
+        34,
+        31,
+        21
+      ]
+    },
+    {
+      "coords": {
+        "x": 1358,
+        "y": 540
+      },
+      "cameraCoords": {
+        "x": 494,
+        "y": 271
+      },
+      "resource_type": "wood",
+      "roll_number": 4,
+      "robber": false,
+      "settlement_ids": [
+        23,
+        35,
+        36,
+        37,
+        33,
+        24
+      ]
+    },
+    {
+      "coords": {
+        "x": 661,
+        "y": 712
+      },
+      "cameraCoords": {
+        "x": 151,
+        "y": 342
+      },
+      "resource_type": "wheat",
+      "roll_number": 8,
+      "robber": false,
+      "settlement_ids": [
+        25,
+        30,
+        38,
+        39,
+        40,
+        26
+      ]
+    },
+    {
+      "coords": {
+        "x": 860,
+        "y": 712
+      },
+      "cameraCoords": {
+        "x": 223,
+        "y": 340
+      },
+      "resource_type": "wood",
+      "roll_number": 6,
+      "robber": false,
+      "settlement_ids": [
+        29,
+        32,
+        41,
+        42,
+        38,
+        30
+      ]
+    },
+    {
+      "coords": {
+        "x": 1060,
+        "y": 712
+      },
+      "cameraCoords": {
+        "x": 353,
+        "y": 334
+      },
+      "resource_type": "desert",
+      "roll_number": null,
+      "robber": true,
+      "settlement_ids": [
+        31,
+        34,
+        43,
+        44,
+        41,
+        32
+      ]
+    },
+    {
+      "coords": {
+        "x": 1259,
+        "y": 712
+      },
+      "cameraCoords": {
+        "x": 455,
+        "y": 332
+      },
+      "resource_type": "sheep",
+      "roll_number": 4,
+      "robber": false,
+      "settlement_ids": [
+        33,
+        37,
+        45,
+        46,
+        43,
+        34
+      ]
+    },
+    {
+      "coords": {
+        "x": 761,
+        "y": 885
+      },
+      "cameraCoords": {
+        "x": 148,
+        "y": 353
+      },
+      "resource_type": "sheep",
+      "roll_number": 10,
+      "robber": false,
+      "settlement_ids": [
+        38,
+        42,
+        47,
+        48,
+        49,
+        39
+      ]
+    },
+    {
+      "coords": {
+        "x": 960,
+        "y": 885
+      },
+      "cameraCoords": {
+        "x": 230,
+        "y": 369
+      },
+      "resource_type": "wood",
+      "roll_number": 5,
+      "robber": false,
+      "settlement_ids": [
+        41,
+        44,
+        50,
+        51,
+        47,
+        42
+      ]
+    },
+    {
+      "coords": {
+        "x": 1159,
+        "y": 885
+      },
+      "cameraCoords": {
+        "x": 358,
+        "y": 362
+      },
+      "resource_type": "wood",
+      "roll_number": 12,
+      "robber": false,
+      "settlement_ids": [
+        43,
+        46,
+        52,
+        53,
+        50,
+        44
+      ]
+    }
+  ],
+  "players": [
+    {
+      "color": "orange",
+      "resources": {
+        "wood": 0,
+        "brick": 0,
+        "sheep": 0,
+        "wheat": 0,
+        "ore": 0
+      },
+      "development_cards": {
+        "knight": 0,
+        "victory_point": 0,
+        "road_building": 0,
+        "year_of_plenty": 0,
+        "monopoly": 0
+      },
+      "played_knights": 0,
+      "has_longest_road": false,
+      "has_largest_army": false,
+      "longest_road_length": 0,
+      "pending_actions": [],
+      "victory_points": 0
+    },
+    {
+      "color": "blue",
+      "resources": {
+        "wood": 0,
+        "brick": 0,
+        "sheep": 0,
+        "wheat": 0,
+        "ore": 0
+      },
+      "development_cards": {
+        "knight": 0,
+        "victory_point": 0,
+        "road_building": 0,
+        "year_of_plenty": 0,
+        "monopoly": 0
+      },
+      "played_knights": 0,
+      "has_longest_road": false,
+      "has_largest_army": false,
+      "longest_road_length": 0,
+      "pending_actions": [],
+      "victory_points": 0
+    },
+    {
+      "color": "red",
+      "resources": {
+        "wood": 0,
+        "brick": 0,
+        "sheep": 0,
+        "wheat": 0,
+        "ore": 0
+      },
+      "development_cards": {
+        "knight": 0,
+        "victory_point": 0,
+        "road_building": 0,
+        "year_of_plenty": 0,
+        "monopoly": 0
+      },
+      "played_knights": 0,
+      "has_longest_road": false,
+      "has_largest_army": false,
+      "longest_road_length": 0,
+      "pending_actions": [],
+      "victory_points": 0
+    }
+  ],
+  "robber_tile_index": 14,
+  "development_deck": [
+    "victory_point",
+    "knight",
+    "knight",
+    "knight",
+    "knight",
+    "year_of_plenty",
+    "knight",
+    "victory_point",
+    "victory_point",
+    "knight",
+    "knight",
+    "knight",
+    "knight",
+    "road_building",
+    "victory_point",
+    "monopoly",
+    "monopoly",
+    "victory_point",
+    "knight",
+    "knight",
+    "road_building",
+    "year_of_plenty",
+    "knight",
+    "knight",
+    "knight"
+  ],
+  "bank": {
+    "resources": {
+      "wood": 19,
+      "brick": 19,
+      "sheep": 19,
+      "wheat": 19,
+      "ore": 19
+    },
+    "development_deck": [
+      "victory_point",
+      "knight",
+      "knight",
+      "knight",
+      "knight",
+      "year_of_plenty",
+      "knight",
+      "victory_point",
+      "victory_point",
+      "knight",
+      "knight",
+      "knight",
+      "knight",
+      "road_building",
+      "victory_point",
+      "monopoly",
+      "monopoly",
+      "victory_point",
+      "knight",
+      "knight",
+      "road_building",
+      "year_of_plenty",
+      "knight",
+      "knight",
+      "knight"
+    ],
+    "discarded_development_cards": []
+  },
+  "game": {
+    "phase": "setup",
+    "current_player_index": 0,
+    "turn_number": 1,
+    "winner": null,
+    "last_roll": null
+  },
+  "setup_state": {
+    "placements_required_per_player": 1,
+    "order": [
+      0,
+      1,
+      2
+    ],
+    "placements_done": {
+      "orange": 0,
+      "blue": 0,
+      "red": 0
+    },
+    "completed": false
+  }
+}

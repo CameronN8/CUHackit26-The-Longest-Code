@@ -23,7 +23,7 @@ Thumbs.db
 
 # Local generated outputs
 runtimeState.json
-gameState.json
+# gameState.json
 gameState_seed*.json
 board_preview*.png
 init_state_preview*.png
