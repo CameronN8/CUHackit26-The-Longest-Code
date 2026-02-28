@@ -9,7 +9,7 @@ Hardware model mirrored from Pico setup:
 - screen 3: interface menu
 
 Dependencies on Pi:
-  pip install adafruit-blinka adafruit-circuitpython-ssd1306 pillow
+  pip install adafruit-blinka adafruit-circuitpython-ssd1306 adafruit-circuitpython-bitbangio pillow
 """
 
 from __future__ import annotations
@@ -49,13 +49,17 @@ class PiSoftI2COled:
     ) -> None:
         try:
             import board  # type: ignore
-            import bitbangio  # type: ignore
+            try:
+                import adafruit_bitbangio as bitbangio  # type: ignore
+            except Exception:
+                import bitbangio  # type: ignore
             import adafruit_ssd1306  # type: ignore
             from PIL import Image, ImageDraw, ImageFont
         except Exception as exc:  # pragma: no cover - hardware dependency
             raise OledDependencyError(
                 "Missing OLED dependencies. Install: "
-                "adafruit-blinka adafruit-circuitpython-ssd1306 pillow"
+                "adafruit-blinka adafruit-circuitpython-ssd1306 "
+                "adafruit-circuitpython-bitbangio pillow"
             ) from exc
 
         self._Image = Image
