@@ -87,12 +87,18 @@ def can_afford(player: dict[str, Any], cost: dict[str, int]) -> bool:
     return all(int(resources.get(r, 0)) >= n for r, n in cost.items())
 
 
-def spend_resources(player: dict[str, Any], cost: dict[str, int]) -> None:
+def spend_resources(
+    game_state: dict[str, Any], player: dict[str, Any], cost: dict[str, int]
+) -> None:
+    bank = _ensure_bank(game_state)
     for resource, amount in cost.items():
         player["resources"][resource] -= amount
+        bank["resources"][resource] = int(bank["resources"].get(resource, 0)) + amount
 
 
-def queue_structure_purchase(player: dict[str, Any], action_type: str) -> bool:
+def queue_structure_purchase(
+    game_state: dict[str, Any], player: dict[str, Any], action_type: str
+) -> bool:
     if action_type not in {"road", "settlement", "city"}:
         return False
 
@@ -100,7 +106,7 @@ def queue_structure_purchase(player: dict[str, Any], action_type: str) -> bool:
     if not can_afford(player, cost):
         return False
 
-    spend_resources(player, cost)
+    spend_resources(game_state, player, cost)
     player.setdefault("pending_actions", []).append({"type": action_type})
     return True
 
@@ -115,13 +121,15 @@ def buy_development_card(game_state: dict[str, Any], player: dict[str, Any]) -> 
     if not deck:
         return False
 
-    spend_resources(player, cost)
+    spend_resources(game_state, player, cost)
     card = deck.pop(0)
     player["development_cards"][card] = int(player["development_cards"].get(card, 0)) + 1
     return True
 
 
-def trade_with_bank(player: dict[str, Any], give: str, get: str, rate: int = 4) -> bool:
+def trade_with_bank(
+    game_state: dict[str, Any], player: dict[str, Any], give: str, get: str, rate: int = 4
+) -> bool:
     if give not in RESOURCE_KEYS or get not in RESOURCE_KEYS or give == get:
         return False
     if rate <= 0:
@@ -131,8 +139,14 @@ def trade_with_bank(player: dict[str, Any], give: str, get: str, rate: int = 4) 
     if int(resources.get(give, 0)) < rate:
         return False
 
+    bank = _ensure_bank(game_state)
+    if int(bank["resources"].get(get, 0)) <= 0:
+        return False
+
     resources[give] -= rate
     resources[get] = int(resources.get(get, 0)) + 1
+    bank["resources"][give] = int(bank["resources"].get(give, 0)) + rate
+    bank["resources"][get] = int(bank["resources"].get(get, 0)) - 1
     return True
 
 
@@ -174,17 +188,17 @@ def run_player_turn(
         action_type = action.get("type", "end_turn")
 
         if action_type == "buy_road":
-            ok = queue_structure_purchase(player, "road")
+            ok = queue_structure_purchase(game_state, player, "road")
             hardware.display_lcd_message("Road queued" if ok else "Cannot buy road")
 
         elif action_type == "buy_settlement":
-            ok = queue_structure_purchase(player, "settlement")
+            ok = queue_structure_purchase(game_state, player, "settlement")
             hardware.display_lcd_message(
                 "Settlement queued" if ok else "Cannot buy settlement"
             )
 
         elif action_type == "buy_city":
-            ok = queue_structure_purchase(player, "city")
+            ok = queue_structure_purchase(game_state, player, "city")
             hardware.display_lcd_message("City queued" if ok else "Cannot buy city")
 
         elif action_type == "buy_development_card":
@@ -193,6 +207,7 @@ def run_player_turn(
 
         elif action_type == "trade_bank":
             ok = trade_with_bank(
+                game_state,
                 player,
                 give=action.get("give", "wood"),
                 get=action.get("get", "brick"),
