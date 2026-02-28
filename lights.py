@@ -14,13 +14,13 @@ class clock:
 
     def _run(self):
         while self._running:
-            count = count + 1
-            if count == 1:
+            self.count = self.count + 1
+            if self.count == 1:
                 self.output.on()
             else:
                 self.output.off()
-            if count == 19:
-                count = 0
+            if self.count == 19:
+                self.count = 0
             sleep(self.delay)
 
     def start(self):
