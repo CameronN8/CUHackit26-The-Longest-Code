@@ -69,6 +69,12 @@ class SSD1306(framebuf.FrameBuffer):
         self.fill(0)
         self.show()
 
+    def write_cmd(self, cmd):
+        raise NotImplementedError("write_cmd must be implemented by subclass")
+
+    def write_data(self, buf):
+        raise NotImplementedError("write_data must be implemented by subclass")
+
     def poweroff(self):
         self.write_cmd(SET_DISP)
 
