@@ -4,6 +4,7 @@ import os
 import random
 import subprocess
 import sys
+import time
 from pathlib import Path
 from typing import Any, Callable
 
@@ -167,6 +168,7 @@ def run_game_loop(
         turns_executed += 1
         if save_snapshot_callback:
             save_snapshot_callback(game_state)
+        time.sleep(5)
 
     if game_state["game"]["phase"] == "ended":
         winner_color = game_state["game"]["winner"]
