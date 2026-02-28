@@ -96,7 +96,7 @@ class BigScreenViewer:
                 self.resource_icons[resource] = icon
 
         for face, filename in DICE_ICON_FILES.items():
-            icon = self._load_png_scaled(ASSETS_DIR / filename, max_px=88)
+            icon = self._load_png_scaled(ASSETS_DIR / filename, max_px=76)
             if icon is not None:
                 self.dice_icons[face] = icon
 
@@ -135,7 +135,7 @@ class BigScreenViewer:
         self.panel_top_mid = self._make_panel(grid, "Roll")
         self.panel_top_mid.grid(row=0, column=1, sticky="nsew", padx=6, pady=6)
 
-        self.panel_top_right = self._make_panel(grid, "Uncirculated Resource Cards")
+        self.panel_top_right = self._make_panel(grid, "Cards Remaining")
         self.panel_top_right.grid(row=0, column=2, sticky="nsew", padx=6, pady=6)
 
         self.panel_bottom_1 = self._make_panel(grid, "Player 1")
@@ -171,13 +171,14 @@ class BigScreenViewer:
         self.die_1_label = tk.Label(
             dice_row,
             textvariable=self.die_1_text,
-            bg="#ffffff",
+            bg=PANEL_BG,
             fg=TXT,
-            font=("Helvetica", 30, "bold"),
+            font=("Helvetica", 24, "bold"),
             width=3,
             height=1,
-            bd=1,
-            relief="solid",
+            bd=0,
+            relief="flat",
+            highlightthickness=0,
         )
         self.die_1_label.pack(side="left", padx=7)
 
@@ -186,19 +187,20 @@ class BigScreenViewer:
             text="+",
             bg=PANEL_BG,
             fg=TXT,
-            font=("Helvetica", 26, "bold"),
+            font=("Helvetica", 22, "bold"),
         ).pack(side="left", padx=4)
 
         self.die_2_label = tk.Label(
             dice_row,
             textvariable=self.die_2_text,
-            bg="#ffffff",
+            bg=PANEL_BG,
             fg=TXT,
-            font=("Helvetica", 30, "bold"),
+            font=("Helvetica", 24, "bold"),
             width=3,
             height=1,
-            bd=1,
-            relief="solid",
+            bd=0,
+            relief="flat",
+            highlightthickness=0,
         )
         self.die_2_label.pack(side="left", padx=7)
 
@@ -208,7 +210,7 @@ class BigScreenViewer:
             textvariable=self.total_var,
             bg=PANEL_BG,
             fg=TXT,
-            font=("Helvetica", 30, "bold"),
+            font=("Helvetica", 24, "bold"),
         ).pack(anchor="center")
 
         bank_body = tk.Frame(self.panel_top_right, bg=PANEL_BG)
@@ -301,20 +303,34 @@ class BigScreenViewer:
         parent.grid_columnconfigure(col, weight=1)
         parent.grid_rowconfigure(row, weight=1)
 
+        icon_holder = tk.Frame(cell, bg="#ffffff", width=52, height=52)
+        icon_holder.pack(pady=(0, 2))
+        icon_holder.pack_propagate(False)
+
         icon = self.dev_icon if key == "dev" else self.resource_icons.get(key)
         if icon is not None:
-            icon_label = tk.Label(cell, image=icon, bg="#ffffff")
+            icon_label = tk.Label(icon_holder, image=icon, bg="#ffffff")
             icon_label.image = icon
-            icon_label.pack(pady=(0, 2))
+            icon_label.place(relx=0.5, rely=0.5, anchor="center")
         else:
             fallback = "Dev" if key == "dev" else key.title()
             tk.Label(
-                cell, text=fallback, bg="#ffffff", fg=MUTED, font=("Helvetica", 11, "bold")
-            ).pack(pady=(0, 2))
+                icon_holder,
+                text=fallback,
+                bg="#ffffff",
+                fg=MUTED,
+                font=("Helvetica", 11, "bold"),
+            ).place(relx=0.5, rely=0.5, anchor="center")
 
-        tk.Label(
-            cell, textvariable=value_var, bg="#ffffff", fg=TXT, font=("Helvetica", 16, "bold")
-        ).pack()
+        count_label = tk.Label(
+            icon_holder,
+            textvariable=value_var,
+            bg="#ffffff",
+            fg=TXT,
+            font=("Helvetica", 14, "bold"),
+        )
+        count_label.place(relx=1.0, rely=1.0, x=-2, y=-1, anchor="se")
+        count_label.lift()
 
     def _render_gain_lines(self, players: list[dict], payouts: dict[str, dict[str, int]]) -> None:
         for child in self.gains_body.winfo_children():
