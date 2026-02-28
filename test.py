@@ -2,7 +2,7 @@ import time
 import lights
 
 # Create a clock on GPIO 17 with 2 Hz
-clock = lights.clock(pin=17, frequency=1)
+clock = lights.clock(pin=17, frequency=500)
 clock.start()  # Starts clock in background
 
 try:
