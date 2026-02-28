@@ -143,23 +143,23 @@ def apply_snapshot_packet(packet):
 
 def uart_packet_loop():
     print("DISPLAY BRIDGE READY (UART)")
-    buf = bytearray()
+    buf = b""
 
     while True:
         if UART_LINK.any():
             chunk = UART_LINK.read(UART_LINK.any())
             if chunk:
-                buf.extend(chunk)
+                buf += chunk
 
         # Sync to magic byte at buffer start.
         while len(buf) > 0 and buf[0] != MAGIC:
-            del buf[0]
+            buf = buf[1:]
 
         if len(buf) < PACKET_SIZE:
             continue
 
-        packet = bytes(buf[:PACKET_SIZE])
-        del buf[:PACKET_SIZE]
+        packet = buf[:PACKET_SIZE]
+        buf = buf[PACKET_SIZE:]
 
         try:
             apply_snapshot_packet(packet)
