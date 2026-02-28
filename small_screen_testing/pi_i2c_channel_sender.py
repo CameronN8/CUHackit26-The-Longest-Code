@@ -21,6 +21,20 @@ UART_TIMEOUT = 0.2
 
 
 _seq = 0
+_tile_seq = 0
+
+RESOURCE_TYPE_TO_INT = {
+    "wood": 0,
+    "brick": 1,
+    "sheep": 2,
+    "wheat": 3,
+    "ore": 4,
+}
+
+# Separate packet family for tile-resource vectors.
+TILE_VEC_MAGIC = 0xD3
+TILE_VEC_VERSION = 0x01
+TILE_VEC_LEN = 19
 
 
 def _next_seq():
@@ -30,10 +44,21 @@ def _next_seq():
     return value
 
 
+def _next_tile_seq():
+    global _tile_seq
+    value = _tile_seq
+    _tile_seq = (_tile_seq + 1) & 0xFF
+    return value
+
+
 def _write_to_pico(packet):
     """Send one fully encoded packet to Pico over UART."""
     with serial.Serial(UART_DEVICE, UART_BAUD, timeout=UART_TIMEOUT) as ser:
         ser.write(packet)
+
+
+def _checksum(data):
+    return sum(data) & 0xFF
 
 
 def send_snapshot(
@@ -96,6 +121,65 @@ def send_players_to_pico(players: list[dict]) -> bytes:
         dev_by_player.append({key: int(dev_cards.get(key, 0) or 0) for key in DEV_KEYS})
 
     return send_snapshot(resources_by_player, victory_points_by_player, dev_by_player)
+
+
+def build_tile_resource_vector(tiles: list[dict], desert_value: int = 0) -> list[int]:
+    """Convert game_state tile resource_type values into a 19-length vector of ints.
+
+    Mapping:
+      wood->0, brick->1, sheep->2, wheat->3, ore->4
+      desert->desert_value (default 0 so all values remain 0..4)
+    """
+    if len(tiles) < TILE_VEC_LEN:
+        raise ValueError("tiles must contain at least 19 entries")
+    if not (0 <= int(desert_value) <= 4):
+        raise ValueError("desert_value must be in range 0..4")
+
+    out = []
+    for idx in range(TILE_VEC_LEN):
+        tile = tiles[idx] if isinstance(tiles[idx], dict) else {}
+        resource = str(tile.get("resource_type", "")).lower()
+
+        if resource == "desert":
+            out.append(int(desert_value))
+            continue
+        if resource not in RESOURCE_TYPE_TO_INT:
+            raise ValueError(f"unknown resource_type at tile {idx}: {resource!r}")
+
+        out.append(RESOURCE_TYPE_TO_INT[resource])
+
+    return out
+
+
+def send_tile_resource_vector(tiles: list[dict], desert_value: int = 0) -> bytes:
+    """Send a compact 19-byte tile resource vector packet over UART.
+
+    Packet layout:
+      [0] magic   = 0xD3
+      [1] version = 0x01
+      [2] seq
+      [3] len     = 19
+      [4..22] tile vector values (each 0..4)
+      [23] checksum over bytes [0..22]
+    """
+    vector = build_tile_resource_vector(tiles, desert_value=desert_value)
+
+    packet = bytearray(24)
+    packet[0] = TILE_VEC_MAGIC
+    packet[1] = TILE_VEC_VERSION
+    packet[2] = _next_tile_seq()
+    packet[3] = TILE_VEC_LEN
+    for idx, value in enumerate(vector):
+        packet[4 + idx] = int(value)
+    packet[-1] = _checksum(packet[:-1])
+
+    _write_to_pico(bytes(packet))
+    return bytes(packet)
+
+
+def send_tile_resource_vector_from_game_state(game_state: dict, desert_value: int = 0) -> bytes:
+    tiles = game_state.get("tiles", [])
+    return send_tile_resource_vector(tiles, desert_value=desert_value)
 
 
 def send_from_game_state(game_state: dict) -> bytes:

@@ -7,7 +7,10 @@ send player snapshots to Pico.
 
 import time
 
-from pi_i2c_channel_sender import send_players_to_pico
+from pi_i2c_channel_sender import (
+    send_players_to_pico,
+    send_tile_resource_vector_from_game_state,
+)
 
 
 def build_mock_players(tick: int):
@@ -70,14 +73,52 @@ def build_mock_players(tick: int):
     return players
 
 
+def build_mock_game_state_with_tiles(tick: int):
+    # Rotate a deterministic tile pattern so each loop sends changing vector data.
+    resource_cycle = [
+        "wood",
+        "brick",
+        "sheep",
+        "wheat",
+        "ore",
+        "desert",
+        "wood",
+        "sheep",
+        "brick",
+        "ore",
+        "wheat",
+        "wood",
+        "sheep",
+        "brick",
+        "ore",
+        "wheat",
+        "wood",
+        "sheep",
+        "brick",
+    ]
+    shift = tick % len(resource_cycle)
+    rotated = resource_cycle[shift:] + resource_cycle[:shift]
+    tiles = [{"resource_type": rt} for rt in rotated[:19]]
+    return {"tiles": tiles}
+
+
 def main():
     tick = 0
-    print("sending mock players with send_players_to_pico(...) ... Ctrl+C to stop")
+    print("sending mock players + mock tile vector ... Ctrl+C to stop")
     try:
         while True:
             players = build_mock_players(tick)
-            packet = send_players_to_pico(players)
-            print(f"tick={tick} sent {len(packet)} bytes")
+            players_packet = send_players_to_pico(players)
+
+            mock_game_state = build_mock_game_state_with_tiles(tick)
+            tiles_packet = send_tile_resource_vector_from_game_state(
+                mock_game_state, desert_value=0
+            )
+
+            print(
+                f"tick={tick} sent players={len(players_packet)} bytes "
+                f"tiles={len(tiles_packet)} bytes"
+            )
             tick += 1
             time.sleep(1.0)
     except KeyboardInterrupt:
