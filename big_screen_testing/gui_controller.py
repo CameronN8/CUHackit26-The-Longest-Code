@@ -12,11 +12,11 @@ DEFAULT_STATE_FILE = ROOT_DIR / "runtimeState.json"
 ASSETS_DIR = Path(__file__).resolve().parent / "assets"
 
 RESOURCE_ICON_FILES = {
-    "wood": "wood.png",
-    "brick": "brick.png",
-    "sheep": "sheep.png",
-    "wheat": "wheat.png",
-    "ore": "ore.png",
+    "wood": ["wood.png"],
+    "brick": ["brick.png"],
+    "sheep": ["sheep.png", "Sheep.png", "sheep_icon.png"],
+    "wheat": ["wheat.png"],
+    "ore": ["ore.png"],
 }
 DICE_ICON_FILES = {
     1: "dice_1.png",
@@ -90,18 +90,33 @@ class BigScreenViewer:
         return img
 
     def _load_icons(self) -> None:
-        for resource, filename in RESOURCE_ICON_FILES.items():
-            icon = self._load_png_scaled(ASSETS_DIR / filename, max_px=44)
+        for resource, filenames in RESOURCE_ICON_FILES.items():
+            icon = None
+            for filename in filenames:
+                icon = self._load_png_scaled(ASSETS_DIR / filename, max_px=56)
+                if icon is not None:
+                    break
+            if icon is None:
+                for asset_path in ASSETS_DIR.iterdir():
+                    if not asset_path.is_file():
+                        continue
+                    if asset_path.suffix.lower() != ".png":
+                        continue
+                    name = asset_path.stem.lower()
+                    if name == resource or name.startswith(f"{resource}_"):
+                        icon = self._load_png_scaled(asset_path, max_px=56)
+                        if icon is not None:
+                            break
             if icon is not None:
                 self.resource_icons[resource] = icon
 
         for face, filename in DICE_ICON_FILES.items():
-            icon = self._load_png_scaled(ASSETS_DIR / filename, max_px=76)
+            icon = self._load_png_scaled(ASSETS_DIR / filename, max_px=64)
             if icon is not None:
                 self.dice_icons[face] = icon
 
         for filename in DEV_ICON_CANDIDATES:
-            icon = self._load_png_scaled(ASSETS_DIR / filename, max_px=44)
+            icon = self._load_png_scaled(ASSETS_DIR / filename, max_px=56)
             if icon is not None:
                 self.dev_icon = icon
                 break
@@ -160,10 +175,10 @@ class BigScreenViewer:
             bg=PANEL_BG,
             fg=MUTED,
             font=("Helvetica", 14, "bold"),
-        ).pack(anchor="center", pady=(4, 10))
+        ).pack(anchor="center", pady=(1, 4))
 
         dice_row = tk.Frame(roll_body, bg=PANEL_BG)
-        dice_row.pack(anchor="center", pady=(0, 10))
+        dice_row.pack(anchor="center", pady=(0, 3))
 
         self.die_1_text = tk.StringVar(value="-")
         self.die_2_text = tk.StringVar(value="-")
@@ -173,7 +188,7 @@ class BigScreenViewer:
             textvariable=self.die_1_text,
             bg=PANEL_BG,
             fg=TXT,
-            font=("Helvetica", 24, "bold"),
+            font=("Helvetica", 20, "bold"),
             width=3,
             height=1,
             bd=0,
@@ -187,7 +202,7 @@ class BigScreenViewer:
             text="+",
             bg=PANEL_BG,
             fg=TXT,
-            font=("Helvetica", 22, "bold"),
+            font=("Helvetica", 18, "bold"),
         ).pack(side="left", padx=4)
 
         self.die_2_label = tk.Label(
@@ -195,7 +210,7 @@ class BigScreenViewer:
             textvariable=self.die_2_text,
             bg=PANEL_BG,
             fg=TXT,
-            font=("Helvetica", 24, "bold"),
+            font=("Helvetica", 20, "bold"),
             width=3,
             height=1,
             bd=0,
@@ -210,8 +225,8 @@ class BigScreenViewer:
             textvariable=self.total_var,
             bg=PANEL_BG,
             fg=TXT,
-            font=("Helvetica", 24, "bold"),
-        ).pack(anchor="center")
+            font=("Helvetica", 20, "bold"),
+        ).pack(anchor="center", pady=(2, 0))
 
         bank_body = tk.Frame(self.panel_top_right, bg=PANEL_BG)
         bank_body.pack(fill="both", expand=True, padx=12, pady=(8, 10))
@@ -303,8 +318,8 @@ class BigScreenViewer:
         parent.grid_columnconfigure(col, weight=1)
         parent.grid_rowconfigure(row, weight=1)
 
-        icon_holder = tk.Frame(cell, bg="#ffffff", width=74, height=74)
-        icon_holder.pack(pady=(0, 2))
+        icon_holder = tk.Frame(cell, bg="#ffffff", width=92, height=92)
+        icon_holder.pack(pady=(0, 0))
         icon_holder.pack_propagate(False)
 
         icon = self.dev_icon if key == "dev" else self.resource_icons.get(key)
@@ -323,13 +338,13 @@ class BigScreenViewer:
             ).place(relx=0.5, rely=0.5, anchor="center")
 
         count_label = tk.Label(
-            icon_holder,
+            cell,
             textvariable=value_var,
             bg="#ffffff",
             fg=TXT,
             font=("Helvetica", 14, "bold"),
         )
-        count_label.place(relx=1.0, rely=1.0, x=-1, y=-1, anchor="se")
+        count_label.place(relx=1.0, rely=1.0, x=-2, y=-2, anchor="se")
         count_label.lift()
 
     def _render_gain_lines(self, players: list[dict], payouts: dict[str, dict[str, int]]) -> None:
@@ -347,7 +362,7 @@ class BigScreenViewer:
                 payout = {}
 
             row = tk.Frame(self.gains_body, bg=PANEL_BG)
-            row.pack(fill="x", pady=6)
+            row.pack(fill="x", pady=2)
 
             circle_wrap = tk.Frame(row, bg=PANEL_BG, width=40, height=40)
             circle_wrap.pack(side="left", padx=(0, 12))
@@ -406,7 +421,7 @@ class BigScreenViewer:
 
         while shown < 3:
             row = tk.Frame(self.gains_body, bg=PANEL_BG)
-            row.pack(fill="x", pady=6)
+            row.pack(fill="x", pady=2)
             tk.Label(row, text="-", bg=PANEL_BG, fg=MUTED, font=("Helvetica", 18, "bold")).pack(
                 side="left"
             )
