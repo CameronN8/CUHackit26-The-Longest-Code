@@ -174,7 +174,7 @@ class DirectPiTurnInput:
         if self._active_player_idx != player_idx:
             self._active_player_idx = player_idx
             self.menu.set_active_player(player_idx)
-            self._render(game_state, player_idx)
+            self._render(game_state, player_idx=0)
 
         while True:
             delta, pressed = self.encoder.read_input()
