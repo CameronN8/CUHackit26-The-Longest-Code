@@ -91,7 +91,7 @@ class BigScreenViewer:
 
     def _load_icons(self) -> None:
         for resource, filename in RESOURCE_ICON_FILES.items():
-            icon = self._load_png_scaled(ASSETS_DIR / filename, max_px=34)
+            icon = self._load_png_scaled(ASSETS_DIR / filename, max_px=44)
             if icon is not None:
                 self.resource_icons[resource] = icon
 
@@ -101,7 +101,7 @@ class BigScreenViewer:
                 self.dice_icons[face] = icon
 
         for filename in DEV_ICON_CANDIDATES:
-            icon = self._load_png_scaled(ASSETS_DIR / filename, max_px=34)
+            icon = self._load_png_scaled(ASSETS_DIR / filename, max_px=44)
             if icon is not None:
                 self.dev_icon = icon
                 break
@@ -303,7 +303,7 @@ class BigScreenViewer:
         parent.grid_columnconfigure(col, weight=1)
         parent.grid_rowconfigure(row, weight=1)
 
-        icon_holder = tk.Frame(cell, bg="#ffffff", width=52, height=52)
+        icon_holder = tk.Frame(cell, bg="#ffffff", width=74, height=74)
         icon_holder.pack(pady=(0, 2))
         icon_holder.pack_propagate(False)
 
@@ -319,7 +319,7 @@ class BigScreenViewer:
                 text=fallback,
                 bg="#ffffff",
                 fg=MUTED,
-                font=("Helvetica", 11, "bold"),
+                font=("Helvetica", 15, "bold"),
             ).place(relx=0.5, rely=0.5, anchor="center")
 
         count_label = tk.Label(
@@ -329,7 +329,7 @@ class BigScreenViewer:
             fg=TXT,
             font=("Helvetica", 14, "bold"),
         )
-        count_label.place(relx=1.0, rely=1.0, x=-2, y=-1, anchor="se")
+        count_label.place(relx=1.0, rely=1.0, x=-1, y=-1, anchor="se")
         count_label.lift()
 
     def _render_gain_lines(self, players: list[dict], payouts: dict[str, dict[str, int]]) -> None:
@@ -349,20 +349,20 @@ class BigScreenViewer:
             row = tk.Frame(self.gains_body, bg=PANEL_BG)
             row.pack(fill="x", pady=6)
 
-            circle_wrap = tk.Frame(row, bg=PANEL_BG, width=28, height=28)
-            circle_wrap.pack(side="left", padx=(0, 10))
+            circle_wrap = tk.Frame(row, bg=PANEL_BG, width=40, height=40)
+            circle_wrap.pack(side="left", padx=(0, 12))
             circle_wrap.pack_propagate(False)
             canvas = tk.Canvas(
                 circle_wrap,
-                width=24,
-                height=24,
+                width=36,
+                height=36,
                 bg=PANEL_BG,
                 highlightthickness=0,
                 bd=0,
             )
             canvas.pack()
             circle_color = PLAYER_COLORS.get(color.lower(), "#7f8c8d")
-            canvas.create_oval(3, 3, 21, 21, fill=circle_color, outline="#333333")
+            canvas.create_oval(3, 3, 33, 33, fill=circle_color, outline="#333333")
 
             segments = 0
             for resource in RESOURCE_ORDER:
@@ -375,7 +375,7 @@ class BigScreenViewer:
                     text=f"+{amount}",
                     bg=PANEL_BG,
                     fg=TXT,
-                    font=("Helvetica", 16, "bold"),
+                    font=("Helvetica", 21, "bold"),
                 ).pack(side="left", padx=(0, 4))
 
                 icon = self.resource_icons.get(resource)
@@ -389,7 +389,7 @@ class BigScreenViewer:
                         text=resource.title(),
                         bg=PANEL_BG,
                         fg=MUTED,
-                        font=("Helvetica", 14, "bold"),
+                        font=("Helvetica", 18, "bold"),
                     ).pack(side="left", padx=(0, 8))
                 segments += 1
 
@@ -399,7 +399,7 @@ class BigScreenViewer:
                     text="+0",
                     bg=PANEL_BG,
                     fg=MUTED,
-                    font=("Helvetica", 16, "bold"),
+                    font=("Helvetica", 21, "bold"),
                 ).pack(side="left")
 
             shown += 1
