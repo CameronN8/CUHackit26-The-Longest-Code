@@ -38,14 +38,15 @@ def main():
         while True:
             clk_now = GPIO.input(ENC_CLK_PIN)
             if clk_now != last_clk:
-                # if GPIO.input(ENC_DT_PIN) != clk_now:
-                #     count += 1
-                # else:
-                #     count -= 1
+                if GPIO.input(ENC_DT_PIN) != clk_now:
+                    count += 1
+                else:
+                    count -= 1
                 print("count =", count)
                 print(GPIO.input(ENC_DT_PIN))
                 last_clk = clk_now
-            GPIO.input(ENC_DT_PIN)
+            print(GPIO.input(ENC_DT_PIN))
+            print(GPIO.input(ENC_CLK_PIN))
 
             btn_now = GPIO.input(ENC_SW_PIN)
             now = time.monotonic()
