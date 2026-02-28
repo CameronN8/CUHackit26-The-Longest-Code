@@ -11,9 +11,9 @@ import RPi.GPIO as GPIO
 
 
 # BCM pin numbers (change to match your wiring)
-ENC_CLK_PIN = 5
-ENC_DT_PIN = 6
-ENC_SW_PIN = 13
+ENC_CLK_PIN = 17
+ENC_DT_PIN = 27
+ENC_SW_PIN = 22
 
 POLL_DELAY_S = 0.002
 BUTTON_DEBOUNCE_S = 0.05
