@@ -132,9 +132,9 @@ class PiDirectPlayerDisplays:
         total = self._resource_total(resources)
         lines = [
             f"Player {player_idx + 1} RES",
-            f"Wood: {resources.get('wood', 0)} Brick: {resources.get('brick', 0)} Sheep: {resources.get('sheep', 0)}",
-            f"Wheat: {resources.get('wheat', 0)} Ore: {resources.get('ore', 0)}",
-            f"TOTAL: {total}",
+            f"Wheat: {resources.get('wheat', 0)}     Brick: {resources.get('brick', 0)}",
+            f"Wood: {resources.get('wood', 0)}     Ore: {resources.get('ore', 0)} ",
+            f"Sheep: {resources.get('sheep', 0)}     TOTAL: {total}",
         ]
         self.resources.draw_lines(lines)
 
