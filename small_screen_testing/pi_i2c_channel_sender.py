@@ -1,131 +1,125 @@
-"""Pi-side sender for channelized Pi->Pico I2C bridge.
+"""Pi-side snapshot sender for 3-player/9-display Pico bridge.
 
-This module is intentionally function-first so you can import it in application
-code (for example from `main.py`) and call explicit APIs with explicit values.
-
-Core flow:
-1) Build a framed packet with `encode_i2c_write(...)`.
-2) Send the frame to the Pico's bridge slave address over Pi I2C bus.
-3) Pico decodes `channel_id` and forwards payload to that channel's downstream bus.
+No command-line arguments are required for normal use.
+Edit constants below once, then call:
+  send_players_to_pico(game_state["players"])
+  send_snapshot(...)
+or:
+  send_from_game_state(...)
 """
-
-import argparse
-from typing import Optional
 
 from smbus2 import SMBus, i2c_msg
 
-from channel_bridge_protocol import encode_i2c_write
+from player_state_protocol import DEV_KEYS, RESOURCE_KEYS, encode_snapshot
 
 
-def send_frame_to_pico(
-    frame: bytes,
-    *,
-    pi_i2c_bus: int,
-    pico_bridge_addr: int,
-) -> None:
-    """Send one already-encoded bridge frame to the Pico bridge address.
+# ===== HARD-CODED PI -> PICO I2C LINK SETTINGS =====
+PI_I2C_BUS = 1          # /dev/i2c-1 on Raspberry Pi (GPIO2/3)
+PICO_I2C_ADDR = 0x42    # Pico bridge slave address
+# ====================================================
 
-    Args:
-        frame: Raw bytes following `channel_bridge_protocol` format.
-        pi_i2c_bus: Linux I2C bus number on Pi (normally 1 -> /dev/i2c-1).
-        pico_bridge_addr: 7-bit I2C slave address of Pico bridge (for example 0x42).
-    """
-    with SMBus(pi_i2c_bus) as bus:
-        # Use low-level i2c message write so payload is not treated as
-        # SMBus register/value semantics. The frame is sent as-is.
-        msg = i2c_msg.write(pico_bridge_addr, frame)
+
+_seq = 0
+
+
+def _next_seq():
+    global _seq
+    value = _seq
+    _seq = (_seq + 1) & 0xFF
+    return value
+
+
+def _write_to_pico(packet: bytes) -> None:
+    """Send one fully encoded packet to Pico over I2C."""
+    with SMBus(PI_I2C_BUS) as bus:
+        msg = i2c_msg.write(PICO_I2C_ADDR, packet)
         bus.i2c_rdwr(msg)
 
 
-def send_i2c_payload(
-    *,
-    channel_id: int,
-    target_addr: int,
-    payload: bytes,
-    pi_i2c_bus: int,
-    pico_bridge_addr: int,
+def send_snapshot(
+    resources_by_player: list[dict[str, int]],
+    victory_points_by_player: list[int],
+    dev_by_player: list[dict[str, int]],
 ) -> bytes:
-    """Encode and send one channelized downstream I2C write command.
+    """Encode and send one player-state snapshot.
 
     Args:
-        channel_id: Router output channel index (0..8).
-        target_addr: Downstream 7-bit I2C address on that channel.
-        payload: Raw bytes to forward to downstream target.
-        pi_i2c_bus: Pi bus id (usually 1).
-        pico_bridge_addr: Pico bridge ingress address.
+        resources_by_player: list of 3 dicts; each dict should include
+            wood/brick/sheep/wheat/ore counts.
+        victory_points_by_player: list of 3 VP integers.
+        dev_by_player: list of 3 dicts; each dict should include
+            knight/victory_point/road_building/year_of_plenty/monopoly counts.
 
     Returns:
-        The encoded frame bytes that were sent. Useful for logging/tests.
+        Raw packet bytes that were sent.
     """
-    frame = encode_i2c_write(channel_id, target_addr, payload)
-    send_frame_to_pico(
-        frame,
-        pi_i2c_bus=pi_i2c_bus,
-        pico_bridge_addr=pico_bridge_addr,
+    packet = encode_snapshot(
+        seq=_next_seq(),
+        resources_by_player=resources_by_player,
+        victory_points_by_player=victory_points_by_player,
+        dev_by_player=dev_by_player,
     )
-    return frame
+    _write_to_pico(packet)
+    return packet
 
 
-def send_text(
-    *,
-    channel_id: int,
-    target_addr: int,
-    text: str,
-    pi_i2c_bus: int,
-    pico_bridge_addr: int,
-    encoding: str = "utf-8",
-) -> bytes:
-    """Convenience wrapper for ASCII/UTF-8 text payload forwarding."""
-    payload = text.encode(encoding)
-    return send_i2c_payload(
-        channel_id=channel_id,
-        target_addr=target_addr,
-        payload=payload,
-        pi_i2c_bus=pi_i2c_bus,
-        pico_bridge_addr=pico_bridge_addr,
-    )
+def send_players_to_pico(players: list[dict]) -> bytes:
+    """Send the first 3 players from a game_state-style players list.
+
+    This is the simplest integration point for your use case:
+      send_players_to_pico(game_state["players"])
+
+    Expected per-player keys:
+      - resources: dict with wood/brick/sheep/wheat/ore
+      - victory_points: int
+      - development_cards (or dev_cards): dict with:
+        knight/victory_point/road_building/year_of_plenty/monopoly
+
+    Missing keys default to 0.
+    """
+    if len(players) < 3:
+        raise ValueError("players must contain at least 3 entries")
+
+    resources_by_player = []
+    victory_points_by_player = []
+    dev_by_player = []
+
+    for idx in range(3):
+        player = players[idx] if isinstance(players[idx], dict) else {}
+        resources = player.get("resources", {})
+        dev_cards = player.get("development_cards", player.get("dev_cards", {}))
+
+        resources_by_player.append(
+            {key: int(resources.get(key, 0) or 0) for key in RESOURCE_KEYS}
+        )
+        victory_points_by_player.append(int(player.get("victory_points", 0) or 0))
+        dev_by_player.append({key: int(dev_cards.get(key, 0) or 0) for key in DEV_KEYS})
+
+    return send_snapshot(resources_by_player, victory_points_by_player, dev_by_player)
 
 
-def parse_int(text: str) -> int:
-    return int(text, 0)
+def send_from_game_state(game_state: dict) -> bytes:
+    """Pull the 3-player snapshot directly from your project game_state object."""
+    players = game_state.get("players", [])
+    return send_players_to_pico(players)
 
 
-def parse_args(argv: Optional[list[str]] = None):
-    """Optional CLI for manual one-shot testing."""
-    parser = argparse.ArgumentParser(description="Send one channelized frame to Pico over I2C")
-    parser.add_argument("--bus", type=int, required=True, help="Pi I2C bus (e.g. 1)")
-    parser.add_argument(
-        "--pico-addr",
-        type=parse_int,
-        required=True,
-        help="Pico bridge I2C slave address (e.g. 0x42)",
-    )
-    parser.add_argument("--channel", type=int, required=True, help="Router channel id 0..8")
-    parser.add_argument(
-        "--target",
-        type=parse_int,
-        required=True,
-        help="Downstream target I2C address (e.g. 0x3C)",
-    )
-    parser.add_argument("--text", required=True, help="Text payload to send")
-    return parser.parse_args(argv)
-
-
-def main(argv: Optional[list[str]] = None):
-    args = parse_args(argv)
-    frame = send_text(
-        channel_id=args.channel,
-        target_addr=args.target,
-        text=args.text,
-        pi_i2c_bus=args.bus,
-        pico_bridge_addr=args.pico_addr,
-    )
-    print(
-        f"sent: bus={args.bus} pico=0x{args.pico_addr:02X} "
-        f"channel={args.channel} target=0x{args.target:02X} "
-        f"payload_bytes={len(args.text.encode('utf-8'))} frame_bytes={len(frame)}"
-    )
+# Optional direct smoke test with hardcoded dummy values.
+def demo_send_once() -> None:
+    resources = [
+        {"wood": 2, "brick": 1, "sheep": 3, "wheat": 0, "ore": 1},
+        {"wood": 0, "brick": 4, "sheep": 1, "wheat": 2, "ore": 2},
+        {"wood": 1, "brick": 1, "sheep": 1, "wheat": 1, "ore": 1},
+    ]
+    vp = [3, 5, 2]
+    dev = [
+        {"knight": 1, "victory_point": 0, "road_building": 0, "year_of_plenty": 0, "monopoly": 0},
+        {"knight": 0, "victory_point": 1, "road_building": 1, "year_of_plenty": 0, "monopoly": 0},
+        {"knight": 2, "victory_point": 0, "road_building": 0, "year_of_plenty": 1, "monopoly": 0},
+    ]
+    packet = send_snapshot(resources, vp, dev)
+    print(f"sent {len(packet)} bytes to pico 0x{PICO_I2C_ADDR:02X} on /dev/i2c-{PI_I2C_BUS}")
 
 
 if __name__ == "__main__":
-    main()
+    demo_send_once()
