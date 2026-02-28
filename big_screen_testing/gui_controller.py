@@ -130,7 +130,9 @@ class BigScreenViewer:
             icon = self._load_png_scaled(ASSETS_DIR / filename, max_px=56)
             if icon is not None:
                 self.dev_icon = icon
-                bank_icon = self._load_png_scaled(ASSETS_DIR / filename, max_px=112)
+                # Dev art tends to appear visually larger than resource art at the same
+                # bounding box, so use a slightly smaller bound for visual parity.
+                bank_icon = self._load_png_scaled(ASSETS_DIR / filename, max_px=84)
                 if bank_icon is not None:
                     self.bank_dev_icon = bank_icon
                 break
