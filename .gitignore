@@ -1,0 +1,32 @@
+﻿# Python bytecode/cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Tooling caches
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# IDE/editor
+.vscode/
+.idea/
+
+# OS junk
+.DS_Store
+Thumbs.db
+
+# Local generated outputs
+runtimeState.json
+gameState.json
+gameState_seed*.json
+board_preview*.png
+init_state_preview*.png
+
+# Optional local color profile overrides
+hsv_profile.local.json
