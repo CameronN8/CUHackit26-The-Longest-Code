@@ -30,6 +30,13 @@ PACKET_SIZE = 37
 RESOURCE_KEYS = ("wood", "brick", "sheep", "wheat", "ore")
 DEV_KEYS = ("knight", "victory_point", "road_building", "year_of_plenty", "monopoly")
 
+# Tile vector packet (separate stream type on same UART):
+# [0]=MAGIC [1]=VERSION [2]=SEQ [3]=LEN [4..]=19 values [last]=CHECKSUM
+TILE_VEC_MAGIC = 0xD3
+TILE_VEC_VERSION = 0x01
+TILE_VEC_LEN = 19
+TILE_VEC_PACKET_SIZE = 24
+
 
 def _clip_u8(value):
     value = int(value)
@@ -108,3 +115,35 @@ def decode_snapshot(packet):
         players.append({"resources": resources, "victory_points": vp, "dev_cards": dev})
 
     return {"seq": seq, "players": players}
+
+
+def encode_tile_resource_vector(seq, vector_19):
+    if len(vector_19) != TILE_VEC_LEN:
+        raise ValueError("tile vector must have 19 entries")
+
+    out = bytearray(TILE_VEC_PACKET_SIZE)
+    out[0] = TILE_VEC_MAGIC
+    out[1] = TILE_VEC_VERSION
+    out[2] = _clip_u8(seq)
+    out[3] = TILE_VEC_LEN
+    for idx, value in enumerate(vector_19):
+        out[4 + idx] = _clip_u8(value)
+    out[-1] = _checksum(out[:-1])
+    return bytes(out)
+
+
+def decode_tile_resource_vector(packet):
+    if len(packet) != TILE_VEC_PACKET_SIZE:
+        raise ValueError("bad tile packet size")
+    if packet[0] != TILE_VEC_MAGIC:
+        raise ValueError("bad tile magic")
+    if packet[1] != TILE_VEC_VERSION:
+        raise ValueError("bad tile version")
+    if packet[3] != TILE_VEC_LEN:
+        raise ValueError("bad tile vector len")
+    if packet[-1] != _checksum(packet[:-1]):
+        raise ValueError("tile checksum mismatch")
+
+    seq = packet[2]
+    vector = list(packet[4 : 4 + TILE_VEC_LEN])
+    return {"seq": seq, "vector": vector}

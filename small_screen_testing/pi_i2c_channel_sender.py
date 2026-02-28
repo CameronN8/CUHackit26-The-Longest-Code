@@ -10,7 +10,13 @@ or:
 
 import serial
 
-from player_state_protocol import DEV_KEYS, RESOURCE_KEYS, encode_snapshot
+from player_state_protocol import (
+    DEV_KEYS,
+    RESOURCE_KEYS,
+    TILE_VEC_LEN,
+    encode_snapshot,
+    encode_tile_resource_vector,
+)
 
 
 # ===== HARD-CODED PI -> PICO UART LINK SETTINGS =====
@@ -31,11 +37,6 @@ RESOURCE_TYPE_TO_INT = {
     "ore": 4,
 }
 
-# Separate packet family for tile-resource vectors.
-TILE_VEC_MAGIC = 0xD3
-TILE_VEC_VERSION = 0x01
-TILE_VEC_LEN = 19
-
 
 def _next_seq():
     global _seq
@@ -55,10 +56,6 @@ def _write_to_pico(packet):
     """Send one fully encoded packet to Pico over UART."""
     with serial.Serial(UART_DEVICE, UART_BAUD, timeout=UART_TIMEOUT) as ser:
         ser.write(packet)
-
-
-def _checksum(data):
-    return sum(data) & 0xFF
 
 
 def send_snapshot(
@@ -164,17 +161,9 @@ def send_tile_resource_vector(tiles: list[dict], desert_value: int = 0) -> bytes
     """
     vector = build_tile_resource_vector(tiles, desert_value=desert_value)
 
-    packet = bytearray(24)
-    packet[0] = TILE_VEC_MAGIC
-    packet[1] = TILE_VEC_VERSION
-    packet[2] = _next_tile_seq()
-    packet[3] = TILE_VEC_LEN
-    for idx, value in enumerate(vector):
-        packet[4 + idx] = int(value)
-    packet[-1] = _checksum(packet[:-1])
-
-    _write_to_pico(bytes(packet))
-    return bytes(packet)
+    packet = encode_tile_resource_vector(_next_tile_seq(), vector)
+    _write_to_pico(packet)
+    return packet
 
 
 def send_tile_resource_vector_from_game_state(game_state: dict, desert_value: int = 0) -> bytes:

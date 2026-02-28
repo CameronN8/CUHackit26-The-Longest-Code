@@ -14,7 +14,13 @@ Ingress:
 
 from machine import Pin, SoftI2C, UART
 import ssd1306
-from player_state_protocol import MAGIC, PACKET_SIZE, decode_snapshot
+from player_state_protocol import (
+    MAGIC,
+    PACKET_SIZE,
+    TILE_VEC_MAGIC,
+    TILE_VEC_PACKET_SIZE,
+    decode_snapshot,
+)
 
 
 # ===== UART LINK (Pi -> Pico) =====
@@ -151,9 +157,22 @@ def uart_packet_loop():
             if chunk:
                 buf += chunk
 
-        # Sync to magic byte at buffer start.
-        while len(buf) > 0 and buf[0] != MAGIC:
+        if len(buf) == 0:
+            continue
+
+        first = buf[0]
+
+        # Foreign tile-vector packet on shared UART stream: skip it whole.
+        if first == TILE_VEC_MAGIC:
+            if len(buf) < TILE_VEC_PACKET_SIZE:
+                continue
+            buf = buf[TILE_VEC_PACKET_SIZE:]
+            continue
+
+        # Not a known packet start: drop one byte and resync.
+        if first != MAGIC:
             buf = buf[1:]
+            continue
 
         if len(buf) < PACKET_SIZE:
             continue
@@ -164,7 +183,7 @@ def uart_packet_loop():
         try:
             apply_snapshot_packet(packet)
         except Exception:
-            # Keep running even if one packet is malformed.
+            # On malformed packet, continue scanning stream.
             pass
 
 
