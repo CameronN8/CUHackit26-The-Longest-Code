@@ -210,5 +210,6 @@ def decode_menu_render(packet):
     for _ in range(MENU_RENDER_LINES):
         raw = payload[cursor : cursor + MENU_RENDER_COLS]
         cursor += MENU_RENDER_COLS
-        lines.append(raw.decode("ascii", errors="ignore").rstrip())
+        # Use positional decode args for MicroPython compatibility.
+        lines.append(raw.decode("ascii", "ignore").rstrip())
     return {"seq": packet[2], "player_idx": player_idx, "lines": lines}

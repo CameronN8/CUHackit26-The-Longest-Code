@@ -44,7 +44,7 @@ DEBUG_MENU_RX = True
 # Quick hardware debug mode:
 # - True: only initialize P1 menu display on SINGLE_MENU_SDA_PIN
 # - False: initialize full 3x3 map below
-SINGLE_DISPLAY_TEST_MODE = True
+SINGLE_DISPLAY_TEST_MODE = False
 SINGLE_MENU_SDA_PIN = 4
 
 # player index -> (resources_sda, vp_sda, menu_sda)
