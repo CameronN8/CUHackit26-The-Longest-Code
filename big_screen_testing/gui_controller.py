@@ -158,8 +158,8 @@ class BigScreenViewer:
 
         for col in range(3):
             grid.grid_columnconfigure(col, weight=1, uniform="col")
-        grid.grid_rowconfigure(0, weight=1)
-        grid.grid_rowconfigure(1, weight=1)
+        grid.grid_rowconfigure(0, weight=3)
+        grid.grid_rowconfigure(1, weight=2)
 
         self.panel_top_left = self._make_panel(grid, "Resources Gained")
         self.panel_top_left.grid(row=0, column=0, sticky="nsew", padx=6, pady=6)
