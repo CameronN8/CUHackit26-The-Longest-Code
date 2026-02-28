@@ -1,2 +1,5 @@
 pyserial
 RPi.GPIO
+adafruit-blinka
+adafruit-circuitpython-ssd1306
+pillow
