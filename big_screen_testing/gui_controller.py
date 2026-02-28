@@ -26,6 +26,13 @@ DICE_ICON_FILES = {
     5: "dice_5.png",
     6: "dice_6.png",
 }
+DEV_ICON_CANDIDATES = ["development_card.png", "dev_card.png", "development.png"]
+PLAYER_COLORS = {
+    "orange": "#f39c12",
+    "blue": "#2980b9",
+    "red": "#c0392b",
+    "white": "#ecf0f1",
+}
 
 PANEL_BG = "#f6f8fc"
 APP_BG = "#ffffff"
@@ -60,6 +67,7 @@ class BigScreenViewer:
         self.last_mtime_ns: int | None = None
         self.resource_icons: dict[str, tk.PhotoImage] = {}
         self.dice_icons: dict[int, tk.PhotoImage] = {}
+        self.dev_icon: tk.PhotoImage | None = None
 
         self.root.title("Catan Display")
         self.root.configure(bg=APP_BG)
@@ -92,6 +100,12 @@ class BigScreenViewer:
             if icon is not None:
                 self.dice_icons[face] = icon
 
+        for filename in DEV_ICON_CANDIDATES:
+            icon = self._load_png_scaled(ASSETS_DIR / filename, max_px=34)
+            if icon is not None:
+                self.dev_icon = icon
+                break
+
     def _make_panel(self, parent: tk.Widget, title: str) -> tk.Frame:
         panel = tk.Frame(parent, bg=PANEL_BG, bd=1, relief="solid")
         tk.Label(
@@ -100,7 +114,7 @@ class BigScreenViewer:
             bg=PANEL_BG,
             fg=TXT,
             font=("Helvetica", 16, "bold"),
-        ).pack(anchor="w", padx=12, pady=(10, 6))
+        ).pack(anchor="center", pady=(10, 6))
         return panel
 
     def _build_ui(self) -> None:
@@ -198,32 +212,24 @@ class BigScreenViewer:
         ).pack(anchor="center")
 
         bank_body = tk.Frame(self.panel_top_right, bg=PANEL_BG)
-        bank_body.pack(fill="both", expand=True, padx=12, pady=(4, 10))
+        bank_body.pack(fill="both", expand=True, padx=12, pady=(8, 10))
+        self.bank_grid = tk.Frame(bank_body, bg=PANEL_BG)
+        self.bank_grid.pack(expand=True)
 
-        self.bank_total_var = tk.StringVar(value="-")
-        tk.Label(
-            bank_body,
-            text="Cards Remaining",
-            bg=PANEL_BG,
-            fg=MUTED,
-            font=("Helvetica", 14, "bold"),
-        ).pack(anchor="center", pady=(8, 8))
-        tk.Label(
-            bank_body,
-            textvariable=self.bank_total_var,
-            bg=PANEL_BG,
-            fg=TXT,
-            font=("Helvetica", 46, "bold"),
-        ).pack(anchor="center", pady=(2, 12))
+        self.bank_card_vars: dict[str, tk.StringVar] = {
+            "wood": tk.StringVar(value="-"),
+            "brick": tk.StringVar(value="-"),
+            "sheep": tk.StringVar(value="-"),
+            "wheat": tk.StringVar(value="-"),
+            "ore": tk.StringVar(value="-"),
+            "dev": tk.StringVar(value="-"),
+        }
 
-        self.bank_breakdown_var = tk.StringVar(value="")
-        tk.Label(
-            bank_body,
-            textvariable=self.bank_breakdown_var,
-            bg=PANEL_BG,
-            fg=MUTED,
-            font=("Helvetica", 12),
-        ).pack(anchor="center")
+        bank_order = ["wood", "brick", "sheep", "wheat", "ore", "dev"]
+        for i, key in enumerate(bank_order):
+            row = i // 3
+            col = i % 3
+            self._make_bank_card_cell(self.bank_grid, row, col, key, self.bank_card_vars[key])
 
         self.player_panels = [self.panel_bottom_1, self.panel_bottom_2, self.panel_bottom_3]
         self.player_title_labels: list[tk.Label] = []
@@ -244,7 +250,7 @@ class BigScreenViewer:
             body = tk.Frame(panel, bg=PANEL_BG)
             body.pack(fill="both", expand=True)
 
-            r_var = tk.StringVar(value="Resource Cards: -")
+            r_var = tk.StringVar(value="Resources: -")
             d_var = tk.StringVar(value="Dev Cards: -")
             self.player_resource_vars.append(r_var)
             self.player_dev_vars.append(d_var)
@@ -254,14 +260,14 @@ class BigScreenViewer:
                 textvariable=r_var,
                 bg=PANEL_BG,
                 fg=TXT,
-                font=("Helvetica", 24, "bold"),
+                font=("Helvetica", 17, "bold"),
             ).pack(anchor="center", pady=(30, 10))
             tk.Label(
                 body,
                 textvariable=d_var,
                 bg=PANEL_BG,
                 fg=MUTED,
-                font=("Helvetica", 20, "bold"),
+                font=("Helvetica", 16, "bold"),
             ).pack(anchor="center")
 
         self.status_var = tk.StringVar(value=f"Watching: {self.state_file}")
@@ -287,6 +293,29 @@ class BigScreenViewer:
         label.configure(image="", width=3, height=1)
         text_var.set(str(value) if isinstance(value, int) else "-")
 
+    def _make_bank_card_cell(
+        self, parent: tk.Widget, row: int, col: int, key: str, value_var: tk.StringVar
+    ) -> None:
+        cell = tk.Frame(parent, bg="#ffffff", bd=1, relief="solid", padx=6, pady=5)
+        cell.grid(row=row, column=col, padx=4, pady=4, sticky="nsew")
+        parent.grid_columnconfigure(col, weight=1)
+        parent.grid_rowconfigure(row, weight=1)
+
+        icon = self.dev_icon if key == "dev" else self.resource_icons.get(key)
+        if icon is not None:
+            icon_label = tk.Label(cell, image=icon, bg="#ffffff")
+            icon_label.image = icon
+            icon_label.pack(pady=(0, 2))
+        else:
+            fallback = "Dev" if key == "dev" else key.title()
+            tk.Label(
+                cell, text=fallback, bg="#ffffff", fg=MUTED, font=("Helvetica", 11, "bold")
+            ).pack(pady=(0, 2))
+
+        tk.Label(
+            cell, textvariable=value_var, bg="#ffffff", fg=TXT, font=("Helvetica", 16, "bold")
+        ).pack()
+
     def _render_gain_lines(self, players: list[dict], payouts: dict[str, dict[str, int]]) -> None:
         for child in self.gains_body.winfo_children():
             child.destroy()
@@ -304,13 +333,20 @@ class BigScreenViewer:
             row = tk.Frame(self.gains_body, bg=PANEL_BG)
             row.pack(fill="x", pady=6)
 
-            tk.Label(
-                row,
-                text=f"{color.title()}:",
+            circle_wrap = tk.Frame(row, bg=PANEL_BG, width=28, height=28)
+            circle_wrap.pack(side="left", padx=(0, 10))
+            circle_wrap.pack_propagate(False)
+            canvas = tk.Canvas(
+                circle_wrap,
+                width=24,
+                height=24,
                 bg=PANEL_BG,
-                fg=TXT,
-                font=("Helvetica", 18, "bold"),
-            ).pack(side="left", padx=(0, 8))
+                highlightthickness=0,
+                bd=0,
+            )
+            canvas.pack()
+            circle_color = PLAYER_COLORS.get(color.lower(), "#7f8c8d")
+            canvas.create_oval(3, 3, 21, 21, fill=circle_color, outline="#333333")
 
             segments = 0
             for resource in RESOURCE_ORDER:
@@ -355,20 +391,16 @@ class BigScreenViewer:
         while shown < 3:
             row = tk.Frame(self.gains_body, bg=PANEL_BG)
             row.pack(fill="x", pady=6)
-            tk.Label(
-                row,
-                text="-",
-                bg=PANEL_BG,
-                fg=MUTED,
-                font=("Helvetica", 18, "bold"),
-            ).pack(side="left")
+            tk.Label(row, text="-", bg=PANEL_BG, fg=MUTED, font=("Helvetica", 18, "bold")).pack(
+                side="left"
+            )
             shown += 1
 
     def _render_player_summaries(self, players: list[dict]) -> None:
         for idx in range(3):
             if idx >= len(players) or not isinstance(players[idx], dict):
                 self.player_title_labels[idx].configure(text=f"Player {idx + 1}")
-                self.player_resource_vars[idx].set("Resource Cards: -")
+                self.player_resource_vars[idx].set("Resources: -")
                 self.player_dev_vars[idx].set("Dev Cards: -")
                 continue
 
@@ -386,7 +418,7 @@ class BigScreenViewer:
                 total_dev_cards = sum(int(v or 0) for v in dev_cards.values())
 
             self.player_title_labels[idx].configure(text=color)
-            self.player_resource_vars[idx].set(f"Resource Cards: {total_resources}")
+            self.player_resource_vars[idx].set(f"Resources: {total_resources}")
             self.player_dev_vars[idx].set(f"Dev Cards: {total_dev_cards}")
 
     def _poll_state_file(self) -> None:
@@ -451,16 +483,17 @@ class BigScreenViewer:
 
         bank_resources = bank.get("resources", {})
         if isinstance(bank_resources, dict):
-            remaining_total = sum(int(bank_resources.get(r, 0) or 0) for r in RESOURCE_ORDER)
-            self.bank_total_var.set(str(remaining_total))
-            self.bank_breakdown_var.set(
-                "  ".join(
-                    f"{r[:2].upper()}: {int(bank_resources.get(r, 0) or 0)}" for r in RESOURCE_ORDER
-                )
-            )
+            for resource in RESOURCE_ORDER:
+                self.bank_card_vars[resource].set(str(int(bank_resources.get(resource, 0) or 0)))
         else:
-            self.bank_total_var.set("-")
-            self.bank_breakdown_var.set("")
+            for resource in RESOURCE_ORDER:
+                self.bank_card_vars[resource].set("-")
+
+        dev_deck = bank.get("development_deck", [])
+        if isinstance(dev_deck, list):
+            self.bank_card_vars["dev"].set(str(len(dev_deck)))
+        else:
+            self.bank_card_vars["dev"].set("-")
 
         normalized_players = [p for p in players if isinstance(p, dict)]
 
